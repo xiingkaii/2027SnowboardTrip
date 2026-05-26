@@ -2,388 +2,47 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="2027滑雪局">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2027 Snowboard Trip</title>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <style>
-        :root { --primary: #C41E3A; --bg: #F2F4F7; --card: #ffffff; --text: #2D3436; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg); margin: 0 auto; max-width: 480px; color: var(--text);
-            padding-bottom: 100px; min-height: 100vh; position: relative;
-        }
-
-        /* Header & Banner */
-        header { 
-            background: #fff; padding: 15px 20px; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 10px solid var(--primary);
-        }
-        header h1 { margin: 0; font-size: 1.5rem; font-weight: 900; color: #1a1a1a; letter-spacing: -0.5px; }
-        .header-sub { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
-        .header-sub p { margin: 0; font-size: 0.85rem; color: #888; font-weight: 500; }
-        .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        /* Tabs Logic */
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 记账模块样式 */
-        .expense-summary { 
-            background: linear-gradient(135deg, #C41E3A, #8E0E25); color: white; 
-            margin: 15px; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 20px rgba(196,30,58,0.2);
-        }
-        .total-amount { font-size: 2.2rem; font-weight: 900; margin: 8px 0; letter-spacing: -1px; }
-        .settlement-card { 
-            background: rgba(255,255,255,0.15); border-radius: 12px; padding: 12px; margin-top: 15px; 
-            text-align: left; font-size: 0.85rem; line-height: 1.6;
-        }
-        .settle-row { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.2); padding: 4px 0; }
-        
-        .input-card { background: #fff; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .form-input { 
-            flex: 1; padding: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; 
-            outline: none; background: #fdfdfd; font-weight: 600;
-        }
-        .btn-add { 
-            width: 100%; background: #1a1a1a; color: white; padding: 15px; border-radius: 12px; 
-            border: none; font-size: 1rem; font-weight: 800; cursor: pointer;
-        }
-
-        /* 列表项样式 */
-        .item-card { 
-            background: #fff; margin: 10px 15px; padding: 15px; border-radius: 12px; 
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0;
-        }
-        .item-info { display: flex; align-items: center; gap: 12px; }
-        .item-icon { 
-            width: 42px; height: 42px; border-radius: 10px; background: #FFF0F2; 
-            color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-        }
-        .item-meta { font-size: 0.75rem; color: #999; margin-top: 2px; }
-        .item-price { text-align: right; font-weight: 800; color: var(--primary); font-size: 1.1rem; }
-        .btn-del { border: none; background: none; color: #ddd; margin-left: 8px; font-size: 1.2rem; padding: 5px; }
-
-        /* 时间轴样式 (行程) */
-        .itinerary-card { background: #fff; margin: 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .day-header { 
-            background: #BC002D; color: white; padding: 15px 20px; display: flex; 
-            justify-content: space-between; align-items: center; cursor: pointer;
-        }
-        .day-body { display: none; padding: 20px; }
-        .itinerary-card.open .day-body { display: block; }
-        .timeline-item { padding-left: 20px; border-left: 2px solid #eee; position: relative; padding-bottom: 20px; }
-        .timeline-item::before { 
-            content: ''; position: absolute; left: -7px; top: 0; width: 12px; height: 12px; 
-            background: #fff; border: 3px solid #BC002D; border-radius: 50%; 
-        }
-
-        /* 酒店样式 */
-        .hotel-card { background: #fff; margin: 15px; padding: 20px; border-radius: 15px; border-left: 6px solid #1565C0; }
-        .hotel-tag { background: #E3F2FD; color: #1565C0; padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 800; }
-        .btn-action { 
-            background: var(--primary); color: white; text-decoration: none; padding: 10px; 
-            border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; font-size: 0.85rem; margin-top: 10px;
-        }
-
-        /* Tab Bar */
-        .nav-bar { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            width: 90%; background: #fff; border-radius: 40px; display: flex; padding: 6px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 2000;
-        }
-        .nav-item { 
-            flex: 1; text-align: center; color: #bbb; padding: 10px 0; border-radius: 30px; 
-            font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
-        .nav-item.active { background: #FEE8EC; color: var(--primary); }
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .row-data { font-size: 0.9rem; color: #333; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1 id="app-title">2027 Snowboard Trip</h1>
-        <div class="header-sub">
-            <p id="app-subtitle">正在同步滑雪局最新数据...</p>
-            <span style="font-size:0.6rem; color:#ddd; font-style:italic;">XingKai Team</span>
-        </div>
-        <img src="banner.png" alt="Snowboard Banner" class="banner-img">
-    </header>
-
-    <div id="tab-itinerary" class="tab-content active">
-        <div id="itinerary-container"></div>
-    </div>
-
-    <div id="tab-hotel" class="tab-content">
-        <div id="hotel-container"></div>
-    </div>
-
-    <div id="tab-expense" class="tab-content">
-        <div class="expense-summary">
-            <div style="font-size:0.8rem; opacity:0.8;">团队共享总开销</div>
-            <div class="total-amount" id="display-total">0 JPY</div>
-            <div id="rate-display" style="font-size:0.75rem; opacity:0.7;">汇率获取中...</div>
-            
-            <div class="settlement-card" id="settle-box">
-                <div style="font-weight: 800; color: #FFD700; margin-bottom: 8px; text-align: center;">⚖️ 8人实时对账单 (基于均值)</div>
-                <div id="settle-text">等待数据输入...</div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="copyReport()" style="flex:1; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:white; border-radius:20px; padding:8px; font-size:0.8rem; font-weight:700;">复制微信报告</button>
-                <button onclick="exportToCSV()" style="flex:1; background:rgba(46,125,50,0.8); border:none; color:white; border-radius:20px; padding:8px; font-size:0.8rem; font-weight:700;">导出 Excel</button>
-            </div>
-        </div>
-
-        <div class="input-card">
-            <div class="form-row">
-                <select id="payer-input" class="form-input" style="color:var(--primary);"></select>
-                <select id="type-input" class="form-input">
-                    <option value="shared">👨‍👩‍👧‍👦 共享AA</option>
-                    <option value="personal">👤 个人私账</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <input type="number" id="amt-input" class="form-input" placeholder="金额 (JPY)">
-                <select id="cat-input" class="form-input">
-                    <option value="Food">🍔 餐饮</option>
-                    <option value="Transport">🚄 交通</option>
-                    <option value="Ticket">🎫 雪票/门票</option>
-                    <option value="Rental">🏂 租赁</option>
-                    <option value="Shopping">🛍️ 购物</option>
-                    <option value="Others">🧩 其他</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <input type="text" id="note-input" class="form-input" placeholder="备注: 如 居酒屋晚餐">
-            </div>
-            <button class="btn-add" onclick="addExpense()">+ 记一笔</button>
-        </div>
-        <div id="expense-list"></div>
-    </div>
-
-    <div id="tab-other" class="tab-content">
-        <div id="other-container"></div>
-    </div>
-
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('itinerary', this)"><span>📅</span><br>行程</div>
-        <div class="nav-item" onclick="switchTab('hotel', this)"><span>🏨</span><br>酒店</div>
-        <div class="nav-item" onclick="switchTab('expense', this)"><span>💰</span><br>记账</div>
-        <div class="nav-item" onclick="switchTab('other', this)"><span>🗂️</span><br>清单</div>
-    </nav>
+    <h1>行程列表 (Debug Mode)</h1>
+    <div id="container">加载中...</div>
 
     <script>
-        // 🌟 核心配置：使用你的 Google Sheet ID
-        const SHEET_ID = '1QMkj-DxDnuGlIoZ_HeTdH7LsFWtaWD0ESrRQrOep4I4';
-       const urls = {
-    itinerary: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1691826831&single=true&output=csv',
-    hotel: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1862468067&single=true&output=csv',
-    settings: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1064984576&single=true&output=csv',
-    other: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1749905006&single=true&output=csv'
-};
+        // 这是你给我的 CSV 链接
+        const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=0&single=true&output=csv';
 
-        // 默认名单（会被 settings 同步）
-        let friends = ["朋友1", "朋友2", "朋友3", "朋友4", "朋友5", "朋友6", "朋友7", "朋友8"];
-        let config = { rate: 0.026, home: 'MYR' };
-        let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v2') || '[]');
-
-        window.onload = function() {
-            loadSettings();
-            setTimeout(loadItinerary, 200);
-            setTimeout(loadHotels, 400);
-            setTimeout(loadOthers, 600);
-        };
-
-        function switchTab(id, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        // === 1. 加载设置与名单 ===
-        function loadSettings() {
-            Papa.parse(urls.settings, { download: true, complete: (res) => {
-                const data = res.data;
-                if(data && data.length > 1) {
-                    config.rate = parseFloat(data[1][2]) || 0.026;
-                    // 从 D 列读取名字
-                    let list = [];
-                    for(let i=1; i<data.length; i++) {
-                        if(data[i][3]) list.push(data[i][3].trim());
-                    }
-                    if(list.length > 0) friends = list;
-                }
-                updateUI();
-            }});
-        }
-
-        function updateUI() {
-            const payerSelect = document.getElementById('payer-input');
-            payerSelect.innerHTML = friends.map(f => `<option value="${f}">${f}</option>`).join('');
-            renderExpenses();
-        }
-
-        // === 2. 记账逻辑 (8人对账) ===
-        function addExpense() {
-            const amt = parseFloat(document.getElementById('amt-input').value);
-            const note = document.getElementById('note-input').value;
-            const payer = document.getElementById('payer-input').value;
-            const type = document.getElementById('type-input').value;
-            const cat = document.getElementById('cat-input').value;
-
-            if(!amt) return alert("请输入金额");
-            
-            const newEx = {
-                id: Date.now(),
-                amount: amt,
-                note: note || cat,
-                payer: payer,
-                type: type,
-                cat: cat,
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                date: new Date().toLocaleDateString()
-            };
-            
-            expenses.unshift(newEx);
-            localStorage.setItem('snow_trip_2027_v2', JSON.stringify(expenses));
-            document.getElementById('amt-input').value = '';
-            document.getElementById('note-input').value = '';
-            renderExpenses();
-        }
-
-        function renderExpenses() {
-            let totalShared = 0;
-            let paidMap = {};
-            friends.forEach(f => paidMap[f] = 0);
-
-            const listCont = document.getElementById('expense-list');
-            listCont.innerHTML = '';
-
-            expenses.forEach(e => {
-                if(e.type === 'shared') {
-                    totalShared += e.amount;
-                    paidMap[e.payer] += e.amount;
-                }
-
-                listCont.innerHTML += `
-                    <div class="item-card">
-                        <div class="item-info">
-                            <div class="item-icon"><i class="fas fa-receipt"></i></div>
-                            <div>
-                                <div style="font-weight:700;">${e.note}</div>
-                                <div class="item-meta">${e.date} ${e.time} • ${e.payer} ${e.type==='shared'?'[AA]':'[私]'}</div>
+        Papa.parse(url, {
+            download: true,
+            complete: function(results) {
+                const container = document.getElementById('container');
+                container.innerHTML = ""; // 清空加载提示
+                
+                // 直接循环打印每一行
+                results.data.forEach((row, index) => {
+                    // 如果这一行有数据
+                    if (row.length > 0 && row.join("").trim() !== "") {
+                        container.innerHTML += `
+                            <div class="card">
+                                <strong>第 ${index + 1} 行:</strong><br>
+                                <div class="row-data">${row.join(" | ")}</div>
                             </div>
-                        </div>
-                        <div class="item-price">
-                            ${e.amount.toLocaleString()} JPY
-                            <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
-                        </div>
-                    </div>`;
-            });
-
-            document.getElementById('display-total').innerText = totalShared.toLocaleString() + ' JPY';
-            document.getElementById('rate-display').innerText = `参考汇率: 1 JPY = ${config.rate} ${config.home}`;
-
-            // 对账计算
-            const avg = totalShared / friends.length;
-            let settleHtml = `<div style="padding-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.2); margin-bottom:8px; font-weight:bold;">人均应付: ${Math.round(avg).toLocaleString()} JPY</div>`;
-            
-            friends.forEach(f => {
-                const diff = paidMap[f] - avg;
-                const color = diff >= 0 ? '#00FF00' : '#FFAAAA';
-                settleHtml += `<div class="settle-row">
-                    <span>${diff >= 0 ? '🟢' : '🔴'} ${f}</span>
-                    <span style="color:${color}; font-weight:bold;">${diff >= 0 ? '多付' : '补交'} ${Math.abs(Math.round(diff)).toLocaleString()}</span>
-                </div>`;
-            });
-            document.getElementById('settle-text').innerHTML = settleHtml;
-        }
-
-        function deleteEx(id) {
-            if(confirm("确定删除记录吗?")) {
-                expenses = expenses.filter(e => e.id !== id);
-                localStorage.setItem('snow_trip_2027_v2', JSON.stringify(expenses));
-                renderExpenses();
+                        `;
+                    }
+                });
+            },
+            error: function(err) {
+                document.getElementById('container').innerText = "加载失败: " + err;
             }
-        }
-
-        // === 3. 行程与酒店渲染 ===
-        function loadItinerary() {
-            Papa.parse(urls.itinerary, { download: true, complete: (res) => {
-                const data = res.data; const cont = document.getElementById('itinerary-container');
-                if(!data) return;
-                let days = new Map();
-                data.forEach((r, i) => {
-                    if(i === 0 || !r[0]) return;
-                    if(!days.has(r[0])) days.set(r[0], { date: r[1], title: r[3], events: [] });
-                    days.get(r[0]).events.push({ time: r[2], act: r[4], rem: r[5], map: r[6] });
-                });
-                cont.innerHTML = "";
-                days.forEach((v, k) => {
-                    let evs = v.events.map(e => `<div class="timeline-item"><span style="font-size:0.7rem; color:#BC002D; font-weight:700;">${e.time}</span><div style="font-weight:700; margin-bottom:5px;">${e.act}</div><div style="font-size:0.75rem; color:#777;">${e.rem||''}</div></div>`).join('');
-                    cont.innerHTML += `<div class="itinerary-card">
-                        <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
-                            <div><strong style="font-size:1.1rem;">${k}</strong> <span style="font-size:0.8rem; opacity:0.8; margin-left:10px;">${v.date}</span></div>
-                            <div style="font-size:0.9rem;">${v.title} <i class="fas fa-chevron-down"></i></div>
-                        </div>
-                        <div class="day-body">${evs}</div>
-                    </div>`;
-                });
-            }});
-        }
-
-        function loadHotels() {
-            Papa.parse(urls.hotel, { download: true, complete: (res) => {
-                const data = res.data; const cont = document.getElementById('hotel-container');
-                cont.innerHTML = data.slice(1).map(h => {
-                    if(!h[2]) return '';
-                    return `<div class="hotel-card">
-                        <span class="hotel-tag">${h[4]}</span>
-                        <div style="font-weight:800; font-size:1.1rem; margin:10px 0;">${h[1]}: ${h[2]}</div>
-                        <div style="font-size:0.85rem; color:#666;">${h[3]}</div>
-                        <a href="${h[6]}" class="btn-action" target="_blank">📍 Google Maps</a>
-                    </div>`;
-                }).join('');
-            }});
-        }
-
-        function loadOthers() {
-            Papa.parse(urls.other, { download: true, complete: (res) => {
-                const data = res.data; const cont = document.getElementById('other-container');
-                cont.innerHTML = `<div style="padding:20px; font-size:0.9rem; color:#666; text-align:center;">更多清单内容（清单功能已就绪）</div>`;
-            }});
-        }
-
-        // === 4. 辅助工具 ===
-        function copyReport() {
-            let report = `🏂 2027 滑雪局实时账单\n------------------\n`;
-            report += `共享总额: ${document.getElementById('display-total').innerText}\n`;
-            report += `人均应付: ${Math.round(expenses.reduce((s,e)=>s+(e.type==='shared'?e.amount:0),0)/friends.length)} JPY\n`;
-            report += `------------------\n对账单:\n` + document.getElementById('settle-text').innerText.replace(/🟢|🔴/g, '').replace(/<[^>]+>/g, '');
-            const el = document.createElement('textarea'); el.value = report; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("✅ 结算报告已复制到剪贴板！");
-        }
-
-        function exportToCSV() {
-            if (expenses.length === 0) return alert("没有数据");
-            const csv = Papa.unparse(expenses);
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "2027_Snowboard_Expenses.csv";
-            link.click();
-        }
+        });
     </script>
 </body>
 </html>
