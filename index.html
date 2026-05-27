@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        :root { --primary: #C41E3A; --bg: #F5F7FA; --dark-red: #BC002D; }
+        :root { --primary: #C41E3A; --bg: #F5F7FA; --dark-red: #BC002D; --dark-blue: #0D47A1; }
         * { box-sizing: border-box; }
         
         body { 
@@ -23,50 +23,80 @@
             min-height: 100vh; position: relative;
         }
 
-        /* 🌟 Header 顶部布局与冰雪标题特效 */
+        /* Header 布局优化 */
         header { 
-            background: #fff; padding: 20px 25px 15px; 
+            background: #fff; padding: 20px 20px 15px; 
             border-top: 15px solid var(--primary); box-shadow: 0 4px 20px rgba(196, 30, 58, 0.08); 
-            text-align: center; /* 确保整体居中 */
+            text-align: center;
         }
         
-        /* ❄️ 冰雪艺术字标题样式 */
+        /* ❄️ 强制单行 + 暗蓝色立体冰晶字 */
         h1 { 
             margin: 0 auto; 
-            font-size: 1.6rem; 
+            font-size: 1.3rem; /* 稍微压缩字号，确保小屏幕手机也能完美单行显示 */
             font-weight: 900; 
             text-align: center;
-            display: inline-block;
-            background: linear-gradient(180deg, #FFFFFF 0%, #E3F2FD 40%, #90CAF9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            /* 叠加多层雪花与冰晶质感的蓝色立体阴影 */
-            text-shadow: 0px 1px 0px #B0BEC5,
-                         0px 2px 0px #90A4AE,
-                         0px 3px 0px #78909C,
-                         0px 4px 5px rgba(144, 202, 249, 0.4),
-                         0px 4px 10px rgba(13, 71, 161, 0.15);
-            letter-spacing: -0.3px;
-            padding-bottom: 2px;
+            color: var(--dark-blue);
+            white-space: nowrap; /* 强制不换行 */
+            letter-spacing: -0.5px;
+            /* 专属暗蓝色立体透镜阴影 */
+            text-shadow: 0px 1px 0px #90CAF9,
+                         0px 2px 0px #64B5F6,
+                         0px 3px 0px #42A5F5,
+                         0px 3px 6px rgba(13, 71, 161, 0.3);
+            padding-bottom: 4px;
         }
         
-        /* 副标题完美居中 */
-        .header-sub-row {
+        /* 📅 自由填写日期与作者行布局 */
+        .header-meta-row {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            margin-top: 6px;
+            margin-top: 12px;
+            padding: 0 4px;
         }
-        header p { margin: 0; color: #666; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px; }
-        .credit-tag { font-size: 0.65rem; color: #ccc !important; font-style: italic; font-weight: normal; }
-        .banner-img { width: 100%; border-radius: 12px; margin-top: 15px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* 动态可填写日期输入框样式 */
+        .date-input-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+        }
+        .date-editable {
+            border: none;
+            background: #F5F7FA;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            width: 160px;
+            outline: none;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .date-editable:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(196, 30, 58, 0.15);
+        }
+        
+        .credit-tag { 
+            font-size: 0.75rem; 
+            color: #888 !important; 
+            font-weight: 700; 
+            letter-spacing: 0.2px;
+            text-align: right;
+        }
+        
+        .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 🏨 酒店 Tab 专属样式 (绝对不动，完美保留) --- */
+        /* --- 🏨 酒店 Tab 专属样式 (保持原封不动，完美保留) --- */
         .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); text-align: left; }
         .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
@@ -111,9 +141,13 @@
 
     <header>
         <h1 id="app-title">2027 日本滑雪之旅 JAPAN TRIP</h1>
-        <div class="header-sub-row">
-            <p id="app-subtitle">加载中...</p>
-            <span class="credit-tag">Created by XingKai</span>
+        
+        <div class="header-meta-row">
+            <div class="date-input-container">
+                <span style="font-size:0.85rem;">📅</span>
+                <input type="text" id="editable-date" class="date-editable" placeholder="点此输入日期..." oninput="saveTripDate(this.value)">
+            </div>
+            <div class="credit-tag">Created by XingKai</div>
         </div>
         <img src="banner.png" alt="Snowboard Banner" class="banner-img">
     </header>
@@ -163,10 +197,19 @@
         let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v4') || '[]');
 
         window.onload = function() {
+            // 读取保存在本地的动态自定义旅行日期
+            const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
+            document.getElementById('editable-date').value = savedDate;
+
             loadSettings();
             setTimeout(loadItinerary, 200);
             setTimeout(loadHotels, 400);
         };
+
+        // 保存用户填写的日期到本地
+        function saveTripDate(val) {
+            localStorage.setItem('snow_trip_custom_date', val);
+        }
 
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -175,7 +218,7 @@
             el.classList.add('active');
         }
 
-        // --- 🏨 酒店数据加载 (保持完美，未做任何改动) ---
+        // --- 🏨 酒店数据加载 (保持完美状态，100%没动) ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -225,9 +268,6 @@
                 const data = res.data;
                 const cont = document.getElementById('itinerary-container');
                 if(!data) return;
-                
-                // 动态获取副标题（如 5-APR >>> 13-APR）
-                if(data[2] && data[2][1]) document.getElementById('app-subtitle').innerText = data[2][1];
 
                 let daysMap = new Map();
                 data.slice(6).forEach((r) => {
