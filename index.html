@@ -16,29 +16,30 @@
         * { box-sizing: border-box; }
         
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            /* 🌟 整体换上更轻快、开心、圆润的现代字体组合 */
+            font-family: "Quicksand", "Comfortaa", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, sans-serif; 
             background: var(--bg); margin: 0 auto; 
             padding-bottom: 120px; 
             color: #333; -webkit-tap-highlight-color: transparent; width: 100%; max-width: 480px; 
             min-height: 100vh; position: relative;
         }
 
-        /* Header 布局优化 */
+        /* Header 布局 */
         header { 
             background: #fff; padding: 20px 20px 15px; 
             border-top: 15px solid var(--primary); box-shadow: 0 4px 20px rgba(196, 30, 58, 0.08); 
             text-align: center;
         }
         
-        /* ❄️ 强制单行 + 暗蓝色立体冰晶字 */
+        /* ❄️ 强制单行 + 暗蓝色立体冰晶字 + 开心圆润体 */
         h1 { 
             margin: 0 auto; 
-            font-size: 1.3rem; /* 稍微压缩字号，确保小屏幕手机也能完美单行显示 */
+            font-size: 1.35rem; 
             font-weight: 900; 
             text-align: center;
             color: var(--dark-blue);
-            white-space: nowrap; /* 强制不换行 */
-            letter-spacing: -0.5px;
+            white-space: nowrap; 
+            letter-spacing: 0.5px; /* 稍微拉开一点字距，显得更轻松活泼 */
             /* 专属暗蓝色立体透镜阴影 */
             text-shadow: 0px 1px 0px #90CAF9,
                          0px 2px 0px #64B5F6,
@@ -47,7 +48,7 @@
             padding-bottom: 4px;
         }
         
-        /* 📅 自由填写日期与作者行布局 */
+        /* 元数据行（日期框与作者签名） */
         .header-meta-row {
             display: flex;
             justify-content: space-between;
@@ -56,7 +57,7 @@
             padding: 0 4px;
         }
         
-        /* 动态可填写日期输入框样式 */
+        /* 日期输入框 */
         .date-input-container {
             display: flex;
             align-items: center;
@@ -75,19 +76,21 @@
             outline: none;
             transition: all 0.2s;
             border: 1px solid transparent;
+            font-family: inherit;
         }
         .date-editable:focus {
             background: #fff;
             border-color: var(--primary);
-            box-shadow: 0 0 5px rgba(196, 30, 58, 0.15);
         }
         
+        /* 极简淡雅版作者标签 */
         .credit-tag { 
-            font-size: 0.75rem; 
-            color: #888 !important; 
-            font-weight: 700; 
-            letter-spacing: 0.2px;
+            font-size: 0.65rem; 
+            color: rgba(0, 0, 0, 0.25) !important; 
+            font-weight: 400; 
+            letter-spacing: 0.1px;
             text-align: right;
+            user-select: none;
         }
         
         .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -96,7 +99,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 🏨 酒店 Tab 专属样式 (保持原封不动，完美保留) --- */
+        /* --- 🏨 酒店 Tab 专属样式 (不动它，完美保留) --- */
         .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); text-align: left; }
         .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
@@ -140,7 +143,7 @@
 <body>
 
     <header>
-        <h1 id="app-title">2027 日本滑雪之旅 JAPAN TRIP</h1>
+        <h1>2027 日本滑雪之旅 JAPAN TRIP</h1>
         
         <div class="header-meta-row">
             <div class="date-input-container">
@@ -197,16 +200,12 @@
         let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v4') || '[]');
 
         window.onload = function() {
-            // 读取保存在本地的动态自定义旅行日期
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
             document.getElementById('editable-date').value = savedDate;
-
             loadSettings();
-            setTimeout(loadItinerary, 200);
             setTimeout(loadHotels, 400);
         };
 
-        // 保存用户填写的日期到本地
         function saveTripDate(val) {
             localStorage.setItem('snow_trip_custom_date', val);
         }
@@ -216,9 +215,9 @@
             document.getElementById('tab-' + id).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
+            if(id === 'itinerary') loadItinerary();
         }
 
-        // --- 🏨 酒店数据加载 (保持完美状态，100%没动) ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -228,32 +227,25 @@
                 
                 data.slice(1).forEach(h => {
                     if(!h || !h[2] || h[2].trim() === "") return;
-                    
                     const tag = h[4] || '住宿';
                     const isAirbnb = tag.toLowerCase().includes('airbnb');
                     const tagClass = isAirbnb ? 'tag-airbnb' : 'tag-hotel';
                     const addr = h[3] || '暂无地址';
                     const remark = h[5] ? `<span class="hotel-remark">${h[5].replace(/\n/g, '<br>')}</span>` : '';
                     const mapLink = h[6] || '';
-                    
                     cont.innerHTML += `
                         <div class="hotel-card">
                             <span class="hotel-tag ${tagClass}">${tag}</span>
-                            <div class="hotel-header-row">
-                                <i class="fas fa-map-marker-alt hotel-icon-pin"></i>
-                                <div class="hotel-title">${h[1] || ''}：${h[2]}</div>
-                            </div>
+                            <div class="hotel-header-row"><i class="fas fa-map-marker-alt hotel-icon-pin"></i><div class="hotel-title">${h[1] || ''}：${h[2]}</div></div>
                             <div class="hotel-date">${h[0] || ''}</div>
-                            <div class="hotel-address-box">
-                                <div>${addr}</div>
-                                ${remark}
-                            </div>
+                            <div class="hotel-address-box"><div>${addr}</div>${remark}</div>
                             <div class="hotel-btns">
                                 ${mapLink ? `<a href="${mapLink}" target="_blank" class="btn-nav"><i class="fas fa-location-arrow"></i> 导航前往</a>` : '<button class="btn-nav" disabled>暂无位置</button>'}
                                 <button class="btn-copy" onclick="copyAddress('${addr.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> 复制地址</button>
                             </div>
                         </div>`;
                 });
+                loadItinerary();
             }});
         }
 
@@ -262,13 +254,11 @@
             alert("✅ 地址已复制！");
         }
 
-        // --- 📅 行程数据加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
                 const cont = document.getElementById('itinerary-container');
                 if(!data) return;
-
                 let daysMap = new Map();
                 data.slice(6).forEach((r) => {
                     if(!r || !r[1] || r[1].trim() === "") return;
@@ -276,7 +266,6 @@
                     if(!daysMap.has(dayKey)) daysMap.set(dayKey, { date: r[2], title: r[4], events: [] });
                     if(r[3] || r[5]) daysMap.get(dayKey).events.push({ time: r[3], act: r[5] || r[4], rem: r[6] });
                 });
-
                 cont.innerHTML = "";
                 daysMap.forEach((v, k) => {
                     let evsHtml = v.events.map(e => `
@@ -285,7 +274,6 @@
                             <span class="event-time">${e.time || '全天'}</span>
                             <div class="event-act">${e.act}</div>
                         </div>`).join('');
-
                     cont.innerHTML += `
                         <div class="card">
                             <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
@@ -298,7 +286,6 @@
             }});
         }
 
-        // --- 💰 记账逻辑 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 if(res.data.length > 1) {
@@ -312,7 +299,7 @@
         function addExpense() {
             const amt = parseFloat(document.getElementById('amt-input').value);
             if(!amt) return alert("请输入金额");
-            const newEx = { id: Date.now(), amount: amt, note: document.getElementById('note-input').value, payer: document.getElementById('payer-input').value, type: document.getElementById('type-input').value, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
+            const newEx = { id: Date.now(), amount: amt, note: document.getElementById('note-input').value, payer: document.getElementById('payer-input').value, type: document.getElementById('type-input').value };
             expenses.unshift(newEx);
             localStorage.setItem('snow_trip_2027_v4', JSON.stringify(expenses));
             renderExpenses();
