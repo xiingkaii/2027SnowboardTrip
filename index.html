@@ -88,9 +88,14 @@
         
         .pool-member-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding: 9px 0; font-size: 0.9rem; font-weight: 700; }
         .pool-member-row:last-child { border-bottom: none; }
-        .member-name-tag { display: flex; align-items: center; gap: 6px; flex-shrink: 0; width: 65px; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .member-money-details { display: flex; justify-content: space-between; flex: 1; padding-left: 5px; }
+        
+        /* 🎨 像素头像和名字样式对齐 */
+        .member-profile-wrapper { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .pixel-avatar { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; background: rgba(255,255,255,0.2); image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.4); }
+        .fallback-avatar { width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: white; text-transform: uppercase; }
+        
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: 2px; }
+        .member-money-details { display: flex; justify-content: space-between; flex: 1; padding-left: 10px; }
 
         /* 操作区域 */
         .input-card { background: white; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
@@ -209,11 +214,29 @@
         let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
         let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v3') || '[]');
 
+        // 🌟 核心配置：在这里映射 8 个人的 Pixel Art 头像链接 
+        // 建议图片使用 1:1 正方形、透明底的 PNG，放在和 index.html 同一个 GitHub 文件夹中。
+        const avatarMaps = {
+            "XK": "xk.png",
+            "YM": "ym.png",
+            "JY": "jy.png",
+            "JP": "jp.png",
+            "WS": "ws.png",
+            "Patric": "patric.png",
+            "CY": "cy.png",
+            "ZK": "zk.png"
+        };
+
+        // 头像自带色彩背景，防止图片没有加载出来时作为优雅备用
+        const avatarBgColors = {
+            "XK": "#FF7675", "YM": "#FDCB6E", "JY": "#0984E3", "JP": "#00B894",
+            "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
+        };
+
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
             document.getElementById('editable-date').value = savedDate;
             
-            // 默认将今天设置到记账日期里
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('expense-date-input').value = today;
 
@@ -307,7 +330,7 @@
             }});
         }
 
-        // --- 💰 记账金库大重组 ---
+        // --- 💰 记账大金库逻辑 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -415,14 +438,11 @@
             expenses.forEach(e => {
                 let badgeText = '';
                 
-                // 💡 三重模式独立解耦计算逻辑
                 if (e.type === 'personal') {
-                    // 1. 公大池注入
                     initialPoolTotal += e.amount;
                     if(memberDepositMap[e.payer] !== undefined) memberDepositMap[e.payer] += e.amount;
                     badgeText = '<span style="color:#2E7D32; font-weight:700;">[大池注入]</span>';
                 } else if (e.type === 'shared') {
-                    // 2. 共享AA，直接从公款扣除
                     totalSpentFromPool += e.amount;
                     const poolInvolvedList = e.involved || friends; 
                     const perHeadCost = e.amount / poolInvolvedList.length;
@@ -431,11 +451,9 @@
                     });
                     badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${poolInvolvedList.length}人]</span>`;
                 } else if (e.type === 'individual_cost') {
-                    // 3. 👤 个人开销（私账模式）：完全不改变 initialPoolTotal，不改变 totalSpentFromPool，不进入公账余额
                     badgeText = '<span style="color:#7F8C8D; font-weight:700;">🔒 [个人私账 • 独立]</span>';
                 }
 
-                // 💡 日期友好转换格式 (例如: "05-27")
                 let displayDate = "";
                 if(e.date) {
                     const dParts = e.date.split('-');
@@ -463,20 +481,28 @@
                     </div>`;
             });
 
-            // 公账剩余
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
-            // 完美左右推开且增加舒适留白的 8 人财务底座明细
+            // 💡 注入 Pixel Art 头像和优雅占位符的渲染底座
             let membersHtml = '';
             friends.forEach(f => {
                 let myBalance = memberDepositMap[f] - memberSpentMap[f];
                 let sign = myBalance >= 0 ? '+' : '';
                 let color = myBalance >= 0 ? '#00FF00' : '#FFAAAA';
                 
+                // 自动检查并渲染头像路径，如果没有就用首字母作为可爱的备用框
+                let avatarHtml = '';
+                if(avatarMaps[f]) {
+                    avatarHtml = `<img src="${avatarMaps[f]}" class="pixel-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+                }
+                let fallbackHtml = `<div class="fallback-avatar" style="background:${avatarBgColors[f] || '#BC002D'}; display:${avatarMaps[f]?'none':'flex'};">${f.charAt(0)}</div>`;
+                
                 membersHtml += `
                     <div class="pool-member-row">
-                        <div class="member-name-tag">
+                        <div class="member-profile-wrapper">
+                            ${avatarHtml}
+                            ${fallbackHtml}
                             <div class="status-dot" style="background:${myBalance >= 0 ? '#00FF00' : '#BC002D'};"></div>
                             <strong>${f}</strong>
                         </div>
