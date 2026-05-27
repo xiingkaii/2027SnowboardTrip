@@ -198,6 +198,21 @@
         <div id="expense-list"></div>
     </div>
 
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('itinerary', this)">
+            <i class="fas fa-calendar-alt" style="font-size: 1.2rem;"></i>
+            <span>行程</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('hotel', this)">
+            <i class="fas fa-hotel" style="font-size: 1.2rem;"></i>
+            <span>酒店</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('expense', this)">
+            <i class="fas fa-coins" style="font-size: 1.2rem;"></i>
+            <span>记账</span>
+        </div>
+    </div>
+
     <script>
         const urls = {
             itinerary: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1691826831&single=true&output=csv',
@@ -218,7 +233,6 @@
             "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
         };
 
-        // 🌟 修复核心：一上屏就必须全功能强行并发渲染，决不允许任何延迟漏掉！
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
             document.getElementById('editable-date').value = savedDate;
@@ -226,7 +240,6 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('expense-date-input').value = today;
 
-            // 强行把所有网络解析和渲染一口气全部启动！
             loadSettings(); 
             loadHotels();
             loadItinerary();
@@ -240,7 +253,6 @@
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
             
-            // 🌟 修复核心：切Tab的一瞬间必须当场重算，防白屏机制
             if(id === 'itinerary') loadItinerary();
             if(id === 'hotel') loadHotels();
             if(id === 'expense') renderExpenses();
@@ -270,7 +282,6 @@
             }, 50);
         }
 
-        // --- 🏨 酒店 Tab 加载 ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -303,7 +314,6 @@
             alert("✅ 地址已复制！");
         }
 
-        // --- 📅 行程 Tab 加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -341,7 +351,6 @@
             }});
         }
 
-        // --- 💰 记账 Tab 设置与同步 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
