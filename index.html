@@ -77,7 +77,7 @@
         .btn-nav-large { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; }
         .btn-copy-large { flex: 1; background: #EAEAEA; color: #333; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* --- 💰 记账 Tab (阿公钱金库 Pool 全新改版) --- */
+        /* --- 💰 记账 Tab --- */
         .pool-panel { 
             background: #BC002D; color: white; margin: 15px; padding: 22px 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(188,0,45,0.25); 
         }
@@ -86,14 +86,13 @@
         
         .pool-members-box { background: rgba(0,0,0,0.15); border-radius: 14px; padding: 14px 16px; margin-top: 15px; text-align: left; }
         
-        /* 💡 修复对齐：将交了和余完全往左右推开，保持舒适视觉间距 */
         .pool-member-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding: 9px 0; font-size: 0.9rem; font-weight: 700; }
         .pool-member-row:last-child { border-bottom: none; }
         .member-name-tag { display: flex; align-items: center; gap: 6px; flex-shrink: 0; width: 65px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; }
         .member-money-details { display: flex; justify-content: space-between; flex: 1; padding-left: 5px; }
 
-        /* 基础操作区 */
+        /* 操作区域 */
         .input-card { background: white; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
         .form-input { 
@@ -101,7 +100,7 @@
         }
         .form-input:focus { background: white; border-color: var(--primary); }
         
-        /* 👥 动态成员勾选网格样式 */
+        /* 动态成员勾选面板 */
         .involvement-grid-title { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 8px 0 10px; display: flex; align-items: center; gap: 4px; }
         .involvement-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #FFF5F6; padding: 12px; border-radius: 10px; border: 1px dashed #FFCDD2; margin-bottom: 15px; }
         .chk-btn-wrapper { display: flex; align-items: center; justify-content: center; }
@@ -158,12 +157,13 @@
         </div>
 
         <div class="input-card">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 记账模式：共享AA默认直接平均扣除公募大池</div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式说明：个人开销记录将完全独立，绝不影响公款池余额</div>
             <div class="form-row">
                 <select id="payer-input" class="form-input" style="color:var(--primary); background:#FFF0F2; border:1px solid #FFCDD2;" onchange="handlePayerChange(this.value)"></select>
                 <select id="type-input" class="form-input" onchange="toggleInvolvementSection(this.value)">
                     <option value="shared">👨‍👩‍👧‍👦 共享AA (扣公款)</option>
                     <option value="personal">👤 个人充值进大池</option>
+                    <option value="individual_cost">🔒 个人开销 (不扣公款)</option>
                 </select>
             </div>
             
@@ -173,7 +173,10 @@
             </div>
 
             <div class="form-row">
-                <input type="number" id="amt-input" class="form-input" placeholder="金额 (JPY)">
+                <input type="date" id="expense-date-input" class="form-input" style="flex:1;">
+                <input type="number" id="amt-input" class="form-input" placeholder="金额 (JPY)" style="flex:1.2;">
+            </div>
+            <div class="form-row">
                 <select id="cat-input" class="form-input">
                     <option value="Food">🍔 餐饮</option>
                     <option value="Transport">🚄 交通</option>
@@ -182,9 +185,7 @@
                     <option value="Shopping">🛍️ 购物</option>
                     <option value="Others">🧩 其他</option>
                 </select>
-            </div>
-            <div class="form-row">
-                <input type="text" id="note-input" class="form-input" placeholder="备注: 如 居酒屋晚餐/缆车票">
+                <input type="text" id="note-input" class="form-input" placeholder="备注: 如 居酒屋晚餐/药妆">
             </div>
             <button class="btn-add" onclick="addExpense()">+ 记一笔</button>
         </div>
@@ -206,11 +207,16 @@
         };
 
         let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
-        let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v2') || '[]');
+        let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v3') || '[]');
 
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
             document.getElementById('editable-date').value = savedDate;
+            
+            // 默认将今天设置到记账日期里
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expense-date-input').value = today;
+
             loadSettings();
             setTimeout(loadHotels, 400);
         };
@@ -225,7 +231,6 @@
             if(id === 'itinerary') loadItinerary();
         }
 
-        // 控制什么时候展现勾选面板
         function toggleInvolvementSection(type) {
             document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none';
         }
@@ -302,7 +307,7 @@
             }});
         }
 
-        // --- 💰 记账大金库数据核心处理 ---
+        // --- 💰 记账金库大重组 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -314,11 +319,9 @@
                     if(list.length > 0) friends = list;
                 }
                 
-                // 💡 在付款人第一项注入“阿公钱”选项！
                 const payerSelect = document.getElementById('payer-input');
                 payerSelect.innerHTML = `<option value="阿公钱">💰 阿公钱 Pool</option>` + friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
                 
-                // 初始化动态选择网格
                 const gridCont = document.getElementById('checkbox-grid-container');
                 gridCont.innerHTML = friends.map(f => `
                     <div class="chk-btn-wrapper">
@@ -326,7 +329,6 @@
                         <label for="user-chk-${f}">${f}</label>
                     </div>`).join('');
 
-                // 若完全没有账目，预设每人充值 10,000 为初始资金
                 if (expenses.length === 0) {
                     friends.forEach(f => {
                         expenses.push({
@@ -336,19 +338,18 @@
                             payer: f,
                             type: "personal",
                             cat: "Others",
-                            involved: [f] // 充值属于个人行为
+                            date: new Date().toISOString().split('T')[0],
+                            involved: [f]
                         });
                     });
-                    localStorage.setItem('snow_trip_pool_v2', JSON.stringify(expenses));
+                    localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
                 }
                 renderExpenses();
             }});
         }
 
-        // 监听付款人选择（如果单独选了某个人垫付共享AA，就自动将他在底下剔除或者提醒）
         function handlePayerChange(val) {
             if(val !== "阿公钱" && document.getElementById('type-input').value === 'shared') {
-                // 垫付人必然在里面
                 const chk = document.getElementById(`user-chk-${val}`);
                 if(chk) chk.checked = true;
             }
@@ -360,32 +361,33 @@
             const payer = document.getElementById('payer-input').value;
             const type = document.getElementById('type-input').value;
             const cat = document.getElementById('cat-input').value;
+            const dateVal = document.getElementById('expense-date-input').value;
 
             if(!amt) return alert("请输入金额");
+            if(!dateVal) return alert("请选择消费日期");
             
             let involvedMembers = [];
             if(type === 'shared') {
-                // 提取被勾选参与这笔账单的成员
                 friends.forEach(f => {
                     if(document.getElementById(`user-chk-${f}`).checked) involvedMembers.push(f);
                 });
                 if(involvedMembers.length === 0) return alert("请至少勾选一位参与这笔公账分摊的成员！");
             } else {
-                // 个人充值只和自己挂钩
                 involvedMembers = [payer === "阿公钱" ? friends[0] : payer];
             }
             
             expenses.unshift({
                 id: Date.now(),
                 amount: amt,
-                note: note || (type === 'shared' ? '共享活动消费' : '公款金库充值'),
+                note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')),
                 payer: payer,
                 type: type,
                 cat: cat,
-                involved: involvedMembers // 记录这笔账到底谁参与了
+                date: dateVal,
+                involved: involvedMembers
             });
             
-            localStorage.setItem('snow_trip_pool_v2', JSON.stringify(expenses));
+            localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
             document.getElementById('amt-input').value = '';
             document.getElementById('note-input').value = '';
             renderExpenses();
@@ -394,61 +396,78 @@
         function deleteEx(id) {
             if(confirm("确定删除这笔账单记录吗?")) {
                 expenses = expenses.filter(e => e.id !== id);
-                localStorage.setItem('snow_trip_pool_v2', JSON.stringify(expenses));
+                localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
                 renderExpenses();
             }
         }
 
         function renderExpenses() {
-            let initialPoolTotal = 0; // 累计注入的公款总额
-            let totalSpentFromPool = 0; // 扣除公款的总额
+            let initialPoolTotal = 0; 
+            let totalSpentFromPool = 0; 
             
-            let memberDepositMap = {}; // 每个人一共交了多少钱
-            let memberSpentMap = {};   // 每个人一共消费了多少钱
+            let memberDepositMap = {}; 
+            let memberSpentMap = {};   
             friends.forEach(f => { memberDepositMap[f] = 0; memberSpentMap[f] = 0; });
 
             const listCont = document.getElementById('expense-list');
             listCont.innerHTML = '';
 
             expenses.forEach(e => {
+                let badgeText = '';
+                
+                // 💡 三重模式独立解耦计算逻辑
                 if (e.type === 'personal') {
+                    // 1. 公大池注入
                     initialPoolTotal += e.amount;
                     if(memberDepositMap[e.payer] !== undefined) memberDepositMap[e.payer] += e.amount;
+                    badgeText = '<span style="color:#2E7D32; font-weight:700;">[大池注入]</span>';
                 } else if (e.type === 'shared') {
+                    // 2. 共享AA，直接从公款扣除
                     totalSpentFromPool += e.amount;
-                    
-                    // 💡 高级算法核心：根据当时记录的参与人数，精确平摊这笔钱
                     const poolInvolvedList = e.involved || friends; 
                     const perHeadCost = e.amount / poolInvolvedList.length;
-                    
                     poolInvolvedList.forEach(m => {
                         if(memberSpentMap[m] !== undefined) memberSpentMap[m] += perHeadCost;
                     });
+                    badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${poolInvolvedList.length}人]</span>`;
+                } else if (e.type === 'individual_cost') {
+                    // 3. 👤 个人开销（私账模式）：完全不改变 initialPoolTotal，不改变 totalSpentFromPool，不进入公账余额
+                    badgeText = '<span style="color:#7F8C8D; font-weight:700;">🔒 [个人私账 • 独立]</span>';
+                }
+
+                // 💡 日期友好转换格式 (例如: "05-27")
+                let displayDate = "";
+                if(e.date) {
+                    const dParts = e.date.split('-');
+                    if(dParts.length === 3) displayDate = `${dParts[1]}月${dParts[2]}日 `;
                 }
 
                 listCont.innerHTML += `
                     <div class="expense-item-card">
                         <div style="display:flex; align-items:center;">
-                            <div class="expense-icon-box"><i class="${e.type==='shared'?'fas fa-shopping-basket':'fas fa-vault'}"></i></div>
+                            <div class="expense-icon-box">
+                                <i class="${e.type==='shared'?'fas fa-shopping-basket':(e.type==='individual_cost'?'fas fa-user-lock':'fas fa-vault')}"></i>
+                            </div>
                             <div>
                                 <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note}</div>
                                 <div style="font-size:0.75rem; color:#888; margin-top:2px;">
-                                    经手人: <strong>${e.payer}</strong> • ${e.type==='shared'? `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${e.involved ? e.involved.length : 8}人参与]</span>` : '<span style="color:#2E7D32; font-weight:700;">[大池注入]</span>'}
+                                    <span style="color:#3498DB; font-weight:bold;">${displayDate}</span>经手: <strong>${e.payer}</strong> • ${badgeText}
                                 </div>
                             </div>
                         </div>
                         <div class="expense-item-price">
-                            <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
+                            <span style="${e.type==='individual_cost'?'color:#7F8C8D; text-decoration:line-through; font-size:1rem; opacity:0.8;':''}">${e.amount.toLocaleString()}</span> 
+                            <small style="font-size:0.65rem; font-weight:700; ${e.type==='individual_cost'?'color:#7F8C8D;':''}">JPY</small>
                             <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
                         </div>
                     </div>`;
             });
 
-            // 大金库当前剩余总余额
+            // 公账剩余
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
-            // 💡 完美左右拉开排版：利用 flex 布局让两边撑满，绝不拥挤！
+            // 完美左右推开且增加舒适留白的 8 人财务底座明细
             let membersHtml = '';
             friends.forEach(f => {
                 let myBalance = memberDepositMap[f] - memberSpentMap[f];
@@ -462,8 +481,8 @@
                             <strong>${f}</strong>
                         </div>
                         <div class="member-money-details">
-                            <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto; padding-right:15px;">交了 ${memberDepositMap[f].toLocaleString()}</span>
-                            <span style="color:${color}; text-align:right;">(余 ${sign}${Math.round(myBalance).toLocaleString()})</span>
+                            <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto; padding-right:25px;">交了 ${memberDepositMap[f].toLocaleString()}</span>
+                            <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">(余 ${sign}${Math.round(myBalance).toLocaleString()})</span>
                         </div>
                     </div>`;
             });
