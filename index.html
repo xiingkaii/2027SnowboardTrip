@@ -79,7 +79,7 @@
 
         /* --- 💰 记账 Tab --- */
         .pool-panel { 
-            background: #BC002D; color: white; margin: 15px; padding: 22px 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(188,0,45,0.25); 
+            background: #BC002D; color: white; margin: 15px; padding: 22px 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(188,0,45,0.25); position: relative;
         }
         .pool-label-badge { background: white; color: var(--dark-red); padding: 3px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 900; display: inline-block; margin-bottom: 6px; }
         .pool-amount-display { font-size: 2.6rem; font-weight: 900; margin: 4px 0; letter-spacing: -1px; }
@@ -110,7 +110,8 @@
         .chk-btn-wrapper label { width: 100%; text-align: center; background: white; border: 1px solid #EAEAEA; padding: 6px 0; border-radius: 6px; font-size: 0.8rem; font-weight: 800; color: #666; cursor: pointer; user-select: none; transition: all 0.2s; }
         .chk-btn-wrapper input[type="checkbox"]:checked + label { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 3px 8px rgba(196,30,58,0.2); }
 
-        .btn-add { width: 100%; background: #1A1A1A; color: white; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; }
+        .btn-add { width: 100%; background: #1A1A1A; color: white; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-add:disabled { background: #888; cursor: not-allowed; }
 
         .expense-item-card { 
             background: white; margin: 0 15px 12px; padding: 15px 18px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.01); 
@@ -120,7 +121,15 @@
         .expense-item-price { font-size: 1.15rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 4px; }
         .expense-item-price.personal-cost-style { color: var(--orange) !important; }
 
-        .btn-del { border: none; background: none; color: #CCC; font-size: 1.3rem; padding-left: 6px; cursor: pointer; }
+        /* 云端与本地的小标记 */
+        .sync-badge { font-size: 0.6rem; padding: 1px 4px; border-radius: 3px; font-weight: 800; margin-left: 4px; vertical-align: middle; }
+        .badge-cloud { background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB; }
+        .badge-local { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
+
+        .refresh-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+        .refresh-btn:active { background: rgba(255,255,255,0.4); }
+        .spinning { animation: spin 0.8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* 底栏 Tab Bar */
         .tab-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: white; border-radius: 50px; display: flex; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; }
@@ -152,23 +161,24 @@
 
     <div id="tab-expense" class="tab-content">
         <div class="pool-panel">
+            <button class="refresh-btn" onclick="fetchCloudExpenses()"><i id="refresh-icon" class="fas fa-sync-alt"></i></button>
             <span class="pool-label-badge">阿公钱 余额</span>
             <div class="pool-amount-display" id="pool-remaining">0 JPY</div>
             
             <div class="pool-members-box">
-                <div style="font-weight: 800; color: #FFD700; margin-bottom: 10px; text-align: center; font-size: 0.85rem;"><i class="fas fa-wallet"></i> 团队 8 人公账实时账户</div>
+                <div style="font-weight: 800; color: #FFD700; margin-bottom: 10px; text-align: center; font-size: 0.85rem;"><i class="fas fa-wallet"></i> 团队 8 人公账实时云账户</div>
                 <div id="members-list-container"></div>
             </div>
         </div>
 
         <div class="input-card">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式说明：个人开销记录将完全独立，绝不影响公款池余额</div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式：公账自动云同步，个人私账仅留存本手机加密。</div>
             <div class="form-row">
                 <select id="payer-input" class="form-input" style="color:var(--primary); background:#FFF0F2; border:1px solid #FFCDD2;" onchange="handlePayerChange(this.value)"></select>
                 <select id="type-input" class="form-input" onchange="toggleInvolvementSection(this.value)">
-                    <option value="shared">👨‍👩‍👧‍👦 共享AA (扣公款)</option>
-                    <option value="personal">👤 个人充值进大池</option>
-                    <option value="individual_cost">🔒 个人开销 (不扣公款)</option>
+                    <option value="shared">👨‍👩‍👧‍👦 共享AA (云同步 • 扣公款)</option>
+                    <option value="personal">👤 个人充值 (云同步 • 进大池)</option>
+                    <option value="individual_cost">🔒 个人开销 (本手机保密 • 不扣公款)</option>
                 </select>
             </div>
             
@@ -192,7 +202,7 @@
                 </select>
                 <input type="text" id="note-input" class="form-input" placeholder="备注: 如 居酒屋晚餐/药妆">
             </div>
-            <button class="btn-add" onclick="addExpense()">+ 记一笔</button>
+            <button class="btn-add" id="submit-btn" onclick="addExpense()">+ 记一笔</button>
         </div>
         
         <div id="expense-list"></div>
@@ -214,6 +224,9 @@
     </div>
 
     <script>
+        // 🚀 完美的云端中转服务器端点 
+        const CLOUD_API = 'https://script.google.com/macros/s/AKfycbxSL5ZmHK7Ua72_q6bWpiBMglignWhyh7r2MofhbUrzK8nyzMbccjt4K7i7WfkqB3tL/exec';
+
         const urls = {
             itinerary: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1691826831&single=true&output=csv',
             hotel: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1862468067&single=true&output=csv',
@@ -221,7 +234,10 @@
         };
 
         let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
-        let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v3') || '[]');
+        
+        // 核心拆分两路：
+        let cloudExpenses = []; // 来自云端 Google Sheet (共享AA 和 个人充值)
+        let localExpenses = JSON.parse(localStorage.getItem('snow_trip_private_local_v1') || '[]'); // 仅本手机绝对私密的账目
 
         const avatarMaps = {
             "XK": "XK.png", "YM": "YM.png", "JY": "JY.png", "JP": "JP.png",
@@ -255,36 +271,29 @@
             
             if(id === 'itinerary') loadItinerary();
             if(id === 'hotel') loadHotels();
-            if(id === 'expense') renderExpenses();
+            if(id === 'expense') fetchCloudExpenses();
         }
 
         function toggleInvolvementSection(type) {
             document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none';
         }
 
-        // 🌟 核心修复 2：针对手机键盘的灵敏监测
         function handleAmountKeyUp(e) {
-            // 无论是手机键盘上的 Go、完成、还是虚拟 Enter 键
             if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
-                document.getElementById('amt-input').blur(); // 强行逼退键盘，促发下一步跳转
+                document.getElementById('amt-input').blur(); 
             }
         }
 
         function jumpToCategory() {
             const amt = document.getElementById('amt-input').value;
             if (amt && amt.trim() !== "") {
-                // 强制将选择核心聚焦
-                setTimeout(() => {
-                    document.getElementById('cat-input').focus();
-                }, 50);
+                setTimeout(() => { document.getElementById('cat-input').focus(); }, 50);
             }
         }
 
         function jumpToNote() {
-            setTimeout(() => {
-                document.getElementById('note-input').focus();
-            }, 50);
+            setTimeout(() => { document.getElementById('note-input').focus(); }, 50);
         }
 
         // --- 🏨 酒店 Tab 加载 ---
@@ -379,15 +388,7 @@
                         <label for="user-chk-${f}">${f}</label>
                     </div>`).join('');
 
-                if (expenses.length === 0) {
-                    friends.forEach(f => {
-                        expenses.push({
-                            id: Date.now() + Math.random(), amount: 10000, note: "初始入股预交公款", payer: f, type: "personal", cat: "Others", date: new Date().toISOString().split('T')[0], involved: [f]
-                        });
-                    });
-                    localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
-                }
-                renderExpenses();
+                fetchCloudExpenses();
             }});
         }
 
@@ -396,6 +397,25 @@
                 const chk = document.getElementById(`user-chk-${val}`);
                 if(chk) chk.checked = true;
             }
+        }
+
+        // 从云端拉取公账
+        function fetchCloudExpenses() {
+            const icon = document.getElementById('refresh-icon');
+            if(icon) icon.classList.add('spinning');
+
+            fetch(CLOUD_API)
+                .then(response => response.json())
+                .then(data => {
+                    cloudExpenses = data;
+                    renderExpenses();
+                })
+                .catch(err => {
+                    console.error("读取云端数据失败，转为离线模式", err);
+                })
+                .finally(() => {
+                    if(icon) icon.classList.remove('spinning');
+                });
         }
 
         function addExpense() {
@@ -419,21 +439,65 @@
                 involvedMembers = [payer === "阿公钱" ? friends[0] : payer];
             }
             
-            expenses.unshift({
-                id: Date.now(), amount: amt, note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')), payer: payer, type: type, cat: cat, date: dateVal, involved: involvedMembers
-            });
-            
-            localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
-            document.getElementById('amt-input').value = '';
-            document.getElementById('note-input').value = '';
-            renderExpenses();
+            const newTx = {
+                id: Date.now() + Math.floor(Math.random()*1000), 
+                amount: amt, 
+                note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')), 
+                payer: payer, 
+                type: type, 
+                cat: cat, 
+                date: dateVal, 
+                involved: involvedMembers
+            };
+
+            // 🌟 核心智能分流路由核心逻辑！
+            if (type === 'individual_cost') {
+                // A. 个人私账：不上云，悄悄进手机缓存
+                localExpenses.unshift(newTx);
+                localStorage.setItem('snow_trip_private_local_v1', JSON.stringify(localExpenses));
+                document.getElementById('amt-input').value = '';
+                document.getElementById('note-input').value = '';
+                renderExpenses();
+                alert("🔒 个人私账已保密存入本机！");
+            } else {
+                // B. 公账（分摊或充值）：立刻上报云端 Google Sheet
+                const btn = document.getElementById('submit-btn');
+                btn.disabled = true;
+                btn.innerText = "⚡ 正在同步到云端...";
+
+                fetch(CLOUD_API, {
+                    method: 'POST',
+                    mode: 'no-cors', // 解决跨域限制写入
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newTx)
+                })
+                .then(() => {
+                    document.getElementById('amt-input').value = '';
+                    document.getElementById('note-input').value = '';
+                    alert("🚀 公账云端同步成功！全员已可见。");
+                    // 稍等一秒让谷歌服务器反应，然后重新拉取最新列表
+                    setTimeout(fetchCloudExpenses, 1000);
+                })
+                .catch(err => {
+                    alert("同步失败，请检查网络后再试");
+                    console.error(err);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerText = "+ 记一笔";
+                });
+            }
         }
 
-        function deleteEx(id) {
+        function deleteEx(id, isLocal) {
             if(confirm("确定删除这笔账单记录吗?")) {
-                expenses = expenses.filter(e => e.id !== id);
-                localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
-                renderExpenses();
+                if (isLocal) {
+                    localExpenses = localExpenses.filter(e => e.id !== id);
+                    localStorage.setItem('snow_trip_private_local_v1', JSON.stringify(localExpenses));
+                    renderExpenses();
+                } else {
+                    alert("💡 云端同步的公账无法直接在手机删除，请通知管理员 XK 在 Google Sheet 试算表内直接删改。");
+                }
             }
         }
 
@@ -448,14 +512,20 @@
             if(!listCont) return;
             listCont.innerHTML = '';
 
-            expenses.sort((a, b) => {
+            // 🌟 强行将公账与私账混合起来，并按时间线排序
+            let combinedExpenses = [];
+            cloudExpenses.forEach(e => { e.isCloud = true; combinedExpenses.push(e); });
+            localExpenses.forEach(e => { e.isCloud = false; combinedExpenses.push(e); });
+
+            combinedExpenses.sort((a, b) => {
                 if (a.date !== b.date) return new Date(b.date) - new Date(a.date);
                 return b.id - a.id; 
             });
 
-            expenses.forEach(e => {
+            combinedExpenses.forEach(e => {
                 let badgeText = '';
                 let isIndividual = false;
+                
                 if (e.type === 'personal') {
                     initialPoolTotal += e.amount;
                     if(memberDepositMap[e.payer] !== undefined) memberDepositMap[e.payer] += e.amount;
@@ -470,14 +540,18 @@
                     badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${poolInvolvedList.length}人]</span>`;
                 } else if (e.type === 'individual_cost') {
                     isIndividual = true;
-                    badgeText = '<span style="color:var(--orange); font-weight:700;">🔒 [个人私账 • 独立]</span>';
+                    badgeText = '<span style="color:var(--orange); font-weight:700;">[个人私账 • 独立]</span>';
                 }
 
                 let displayDate = "";
                 if(e.date) {
-                    const dParts = e.date.split('-');
-                    if(dParts.length === 3) displayDate = `${dParts[1]}月${dParts[2]}日 `;
+                    // 处理谷歌返回的日期对象格式或者字符串格式
+                    const dStr = typeof e.date === 'string' ? e.date : e.date.split('T')[0];
+                    const dParts = dStr.split('-');
+                    if(dParts.length === 3) displayDate = `${parseInt(dParts[1])}月${parseInt(dParts[2])}日 `;
                 }
+
+                const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">云公账</span>` : `<span class="sync-badge badge-local">私密本端</span>`;
 
                 listCont.innerHTML += `
                     <div class="expense-item-card">
@@ -486,7 +560,7 @@
                                 <i class="${e.type==='shared'?'fas fa-shopping-basket':(e.type==='individual_cost'?'fas fa-user-lock':'fas fa-vault')}"></i>
                             </div>
                             <div>
-                                <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note}</div>
+                                <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note} ${syncTag}</div>
                                 <div style="font-size:0.75rem; color:#888; margin-top:2px;">
                                     <span style="color:#3498DB; font-weight:bold;">${displayDate}</span>经手: <strong>${e.payer}</strong> • ${badgeText}
                                 </div>
@@ -494,11 +568,12 @@
                         </div>
                         <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
                             <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
-                            <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
+                            <button class="btn-del" onclick="deleteEx(${e.id}, ${!e.isCloud})">×</button>
                         </div>
                     </div>`;
             });
 
+            // 完美的阿公大池子资产实时变动计算
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
