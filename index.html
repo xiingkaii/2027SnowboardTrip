@@ -8,6 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="2027滑雪局">
     <title>2027 Snowboard Trip</title>
     
+    <link rel="icon" type="image/png" href="Icon.png">
+    <link rel="apple-touch-icon" href="Icon.png">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -113,7 +116,7 @@
         .btn-add { width: 100%; background: #1A1A1A; color: white; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-add:disabled { background: #888; cursor: not-allowed; }
 
-        /* 🌟 日期分组大标题样式 */
+        /* 日期分组大标题样式 */
         .expense-group-title { font-size: 0.95rem; font-weight: 900; color: var(--dark-blue); margin: 20px 18px 10px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
         .expense-group-title::before { content: ""; display: inline-block; width: 4px; height: 14px; background: var(--primary); border-radius: 2px; }
 
@@ -263,7 +266,6 @@
 
         function saveTripDate(val) { localStorage.setItem('snow_trip_custom_date', val); }
 
-        // 切换 Tab 时顺便重算/拉取对应数据
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
@@ -286,6 +288,7 @@
             }
         }
 
+        // 数据流向控制
         function jumpToCategory() {
             const amt = document.getElementById('amt-input').value;
             if (amt && amt.trim() !== "") {
@@ -297,7 +300,6 @@
             setTimeout(() => { document.getElementById('note-input').focus(); }, 50);
         }
 
-        // --- 🏨 酒店 Tab 加载 ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -330,7 +332,6 @@
             alert("✅ 地址已复制！");
         }
 
-        // --- 📅 行程 Tab 加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -368,7 +369,6 @@
             }});
         }
 
-        // --- 💰 记账 Tab 基础同步配置 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -400,7 +400,6 @@
             }
         }
 
-        // 从云端拉取公账
         function fetchCloudExpenses() {
             const icon = document.getElementById('refresh-icon');
             if(icon) icon.classList.add('spinning');
@@ -412,7 +411,7 @@
                     renderExpenses();
                 })
                 .catch(err => {
-                    console.error("加载云端同步失败，切换至混合视图", err);
+                    console.error("加载云端同步失败", err);
                     renderExpenses();
                 })
                 .finally(() => {
@@ -464,7 +463,6 @@
                 btn.disabled = true;
                 btn.innerText = "⚡ 正在同步到云端...";
 
-                // 优化：标准表单编码发送，确保谷歌 Script 跨域100%安全写入
                 fetch(CLOUD_API, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -500,7 +498,7 @@
             }
         }
 
-        // 🌟 核心升级：分组且倒序排列的渲染逻辑
+        // 分组且倒序排列的渲染逻辑
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
@@ -512,12 +510,10 @@
             if(!listCont) return;
             listCont.innerHTML = '';
 
-            // 合并公私账目
             let combinedExpenses = [];
             cloudExpenses.forEach(e => { e.isCloud = true; combinedExpenses.push(e); });
             localExpenses.forEach(e => { e.isCloud = false; combinedExpenses.push(e); });
 
-            // 严格的智能倒序排序：优先比对日期，再比对精确时间戳
             combinedExpenses.sort((a, b) => {
                 const dKeyA = typeof a.date === 'string' ? a.date.split('T')[0] : '';
                 const dKeyB = typeof b.date === 'string' ? b.date.split('T')[0] : '';
@@ -525,7 +521,6 @@
                 return b.id - a.id; 
             });
 
-            // 🌟 核心改动：利用数据桶将账目按日期分组
             let groupedMap = new Map();
 
             combinedExpenses.forEach(e => {
@@ -541,7 +536,6 @@
                     });
                 }
 
-                // 提取优化的日期大标签：形如 "5月27日"
                 let dateGroupKey = "未指定日期";
                 if(e.date) {
                     const dStr = typeof e.date === 'string' ? e.date.split('T')[0] : '';
@@ -557,12 +551,9 @@
                 groupedMap.get(dateGroupKey).push(e);
             });
 
-            // 🌟 按日期顺序依次渲染出带有大标签的内容块
             groupedMap.forEach((txList, dateTitle) => {
-                // 1. 先打上红格子位置对应的日期大分类标题
                 listCont.innerHTML += `<div class="expense-group-title">${dateTitle}</div>`;
                 
-                // 2. 依次塞入这一天的每一笔消费卡片
                 txList.forEach(e => {
                     let badgeText = '';
                     let isIndividual = false;
@@ -599,7 +590,6 @@
                 });
             });
 
-            // 阿公大池子计算
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
