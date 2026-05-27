@@ -179,7 +179,7 @@
 
             <div class="form-row">
                 <input type="date" id="expense-date-input" class="form-input" style="flex:1;">
-                <input type="text" id="amt-input" class="form-input" placeholder="金额 (JPY)" inputmode="decimal" style="flex:1.2;" onkeydown="handleAmountKeyDown(event)" onblur="jumpToCategory()">
+                <input type="text" id="amt-input" class="form-input" placeholder="金额 (JPY)" inputmode="decimal" style="flex:1.2;" onkeyup="handleAmountKeyUp(event)" onblur="jumpToCategory()">
             </div>
             <div class="form-row">
                 <select id="cat-input" class="form-input" onchange="jumpToNote()">
@@ -262,17 +262,22 @@
             document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none';
         }
 
-        function handleAmountKeyDown(e) {
-            if (e.key === 'Enter') {
+        // 🌟 核心修复 2：针对手机键盘的灵敏监测
+        function handleAmountKeyUp(e) {
+            // 无论是手机键盘上的 Go、完成、还是虚拟 Enter 键
+            if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
-                document.getElementById('amt-input').blur();
+                document.getElementById('amt-input').blur(); // 强行逼退键盘，促发下一步跳转
             }
         }
 
         function jumpToCategory() {
             const amt = document.getElementById('amt-input').value;
             if (amt && amt.trim() !== "") {
-                document.getElementById('cat-input').focus();
+                // 强制将选择核心聚焦
+                setTimeout(() => {
+                    document.getElementById('cat-input').focus();
+                }, 50);
             }
         }
 
@@ -282,6 +287,7 @@
             }, 50);
         }
 
+        // --- 🏨 酒店 Tab 加载 ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -314,6 +320,7 @@
             alert("✅ 地址已复制！");
         }
 
+        // --- 📅 行程 Tab 加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -351,6 +358,7 @@
             }});
         }
 
+        // --- 💰 记账 Tab ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
