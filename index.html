@@ -70,24 +70,31 @@
         .event-time { color: var(--primary); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px; }
         .event-act { font-weight: 800; font-size: 1.05rem; color: #111; margin-bottom: 6px; }
         .event-remark-box { background: var(--remark-bg); padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #444; line-height: 1.5; margin-bottom: 10px; border-left: 3px solid var(--primary); }
-        
-        /* 按钮容器：让路线和攻略并排显示 */
         .event-btns-row { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
-        
         .btn-map-small { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
-        
-        /* 🌟 新增：Reference Link 攻略链接按钮样式（粉色元气感） */
         .btn-ref-small { background: #FFEBEE; color: #C41E3A; border: 1px solid #FFCDD2; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: background 0.2s; }
-        .btn-ref-small:active { background: #FFCDD2; }
 
-        /* --- 🏨 酒店 Tab 专属样式 --- */
-        .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: left; }
-        .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
+        /* --- 🏨 酒店 Tab 专属样式（完美还原截图视觉） --- */
+        .hotel-card { background: white; border-radius: 16px; margin: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: left; border: 1px solid rgba(0,0,0,0.01); }
+        
+        .hotel-tag { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
         .tag-hotel { background: #E3F2FD; color: #1565C0; }
-        .hotel-address-box { background: #F9FAFB; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; color: #333; font-weight: 600; line-height: 1.6; }
-        .btn-nav { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-copy { flex: 1; background: #F0F0F0; color: #333; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        
+        .hotel-title-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+        .hotel-icon-pin { color: #E91E63; font-size: 1.1rem; margin-top: 3px; flex-shrink: 0; }
+        .hotel-title-text { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; line-height: 1.3; }
+        .hotel-date-text { font-size: 0.85rem; color: #888; font-weight: 500; margin-bottom: 15px; padding-left: 2px; }
+        
+        /* 浅灰色大面积内置内容容器 */
+        .hotel-content-container { background: #F8F9FA; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-size: 0.95rem; color: #333; line-height: 1.6; }
+        .hotel-address-text { font-weight: 600; margin-bottom: 8px; color: #2D3436; }
+        .hotel-remark-text { font-size: 0.85rem; color: #555; font-weight: 400; border-top: 1px solid #EAEAEA; padding-top: 8px; margin-top: 8px; }
+        
+        /* 底部一红一灰无缝大按钮栏 */
+        .hotel-action-buttons { display: flex; gap: 12px; width: 100%; }
+        .btn-nav-large { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 10px rgba(188, 0, 45, 0.15); border: none; }
+        .btn-copy-large { flex: 1; background: #EAEAEA; color: #333; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
         /* --- 💰 记账 Tab 样式 --- */
         .expense-header { background: linear-gradient(135deg, #C41E3A, #8E0E25); color: white; padding: 25px; margin: 15px; border-radius: 16px; text-align: center; }
@@ -177,6 +184,54 @@
             if(id === 'itinerary') loadItinerary();
         }
 
+        // --- 🏨 酒店 Tab 加载逻辑（完美匹配截图结构） ---
+        function loadHotels() {
+            Papa.parse(urls.hotel, { download: true, complete: (res) => {
+                const data = res.data;
+                const cont = document.getElementById('hotel-container');
+                if(!data) return;
+                cont.innerHTML = "";
+                
+                data.slice(1).forEach(h => {
+                    if(!h || !h[2] || h[2].trim() === "") return;
+                    
+                    const tag = h[4] || '住宿';
+                    const isAirbnb = tag.toLowerCase().includes('airbnb');
+                    const tagClass = isAirbnb ? 'tag-airbnb' : 'tag-hotel';
+                    const addr = h[3] || '暂无地址';
+                    const remark = h[5] ? `<div class="hotel-remark-text">${h[5].replace(/\n/g, '<br>')}</div>` : '';
+                    const mapLink = h[6] || '';
+                    
+                    cont.innerHTML += `
+                        <div class="hotel-card">
+                            <span class="hotel-tag ${tagClass}">${tag}</span>
+                            <div class="hotel-title-row">
+                                <i class="fas fa-map-marker-alt hotel-icon-pin"></i>
+                                <div class="hotel-title-text">${h[1]}：${h[2]}</div>
+                            </div>
+                            <div class="hotel-date-text">${h[0] || ''}</div>
+                            
+                            <div class="hotel-content-container">
+                                <div class="hotel-address-text">${addr}</div>
+                                ${remark}
+                            </div>
+                            
+                            <div class="hotel-action-buttons">
+                                ${mapLink ? `<a href="${mapLink}" target="_blank" class="btn-nav-large"><i class="fas fa-paper-plane"></i> 导航前往</a>` : '<button class="btn-nav-large" disabled>暂无位置</button>'}
+                                <button class="btn-copy-large" onclick="copyAddress('${addr.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> 复制地址</button>
+                            </div>
+                        </div>`;
+                });
+                loadItinerary();
+            }});
+        }
+
+        function copyAddress(t) {
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert("✅ 地址已复制！");
+        }
+
+        // --- 📅 行程数据加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -187,18 +242,9 @@
                 data.slice(6).forEach((r) => {
                     if(!r || !r[0] || r[0].trim() === "") return;
                     const dayKey = r[0].trim();
-                    
-                    if(!daysMap.has(dayKey)) {
-                        daysMap.set(dayKey, { dayNum: dayKey, dateLabel: r[1] || '', mainTitle: r[3] || '', events: [] });
-                    }
+                    if(!daysMap.has(dayKey)) daysMap.set(dayKey, { dayNum: dayKey, dateLabel: r[1] || '', mainTitle: r[3] || '', events: [] });
                     if(r[4]) {
-                        daysMap.get(dayKey).events.push({
-                            time: r[2] || '',  // C列: Time
-                            act: r[4] || '',   // E列: Activity
-                            rem: r[5] || '',   // F列: Remarks
-                            map: r[6] || '',   // G列: Map Link
-                            ref: r[7] || ''    // 🌟 H列: Reference Link (Index 7)
-                        });
+                        daysMap.get(dayKey).events.push({ time: r[2] || '', act: r[4] || '', rem: r[5] || '', map: r[6] || '', ref: r[7] || '' });
                     }
                 });
 
@@ -210,7 +256,6 @@
                             <span class="event-time">${e.time}</span>
                             <div class="event-act">${e.act}</div>
                             ${e.rem ? `<div class="event-remark-box">${e.rem.replace(/\n/g, '<br>')}</div>` : ''}
-                            
                             <div class="event-btns-row">
                                 ${e.map && e.map.startsWith('http') ? `<a href="${e.map}" target="_blank" class="btn-map-small"><i class="fas fa-route"></i> 路线</a>` : ''}
                                 ${e.ref && e.ref.startsWith('http') ? `<a href="${e.ref}" target="_blank" class="btn-ref-small"><i class="fas fa-link"></i> 攻略</a>` : ''}
@@ -218,50 +263,15 @@
                         </div>`).join('');
 
                     cont.innerHTML += `
-                        <div class="itinerary-card">
+                        <div class="card">
                             <div class="itinerary-header" onclick="this.parentElement.classList.toggle('open')">
-                                <div class="itinerary-day-box">
-                                    <span class="day-label">${v.dayNum}</span>
-                                    <span class="date-label">${v.dateLabel}</span>
-                                </div>
-                                <div class="itinerary-title-box">
-                                    <span class="main-title">${v.mainTitle}</span>
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
+                                <div class="itinerary-day-box"><span class="day-label">${v.dayNum}</span><span class="date-label">${v.dateLabel}</span></div>
+                                <div class="itinerary-title-box"><span class="main-title">${v.mainTitle}</span><i class="fas fa-chevron-down"></i></div>
                             </div>
                             <div class="itinerary-body">${eventsHtml}</div>
                         </div>`;
                 });
             }});
-        }
-
-        function loadHotels() {
-            Papa.parse(urls.hotel, { download: true, complete: (res) => {
-                const data = res.data;
-                const cont = document.getElementById('hotel-container');
-                cont.innerHTML = "";
-                data.slice(1).forEach(h => {
-                    if(!h || !h[2]) return;
-                    const tag = h[4] || '住宿';
-                    const isAirbnb = tag.toLowerCase().includes('airbnb');
-                    cont.innerHTML += `
-                        <div class="hotel-card">
-                            <span class="hotel-tag ${isAirbnb?'tag-airbnb':'tag-hotel'}">${tag}</span>
-                            <div style="font-weight:800; font-size:1.1rem; margin-bottom:10px;">${h[1]}：${h[2]}</div>
-                            <div class="hotel-address-box">${h[3]}</div>
-                            <div style="display:flex; gap:10px;">
-                                <a href="${h[6]}" target="_blank" class="btn-nav"><i class="fas fa-location-arrow"></i> 导航前往</a>
-                                <button class="btn-copy" onclick="copyAddress('${h[3]}')"><i class="fas fa-copy"></i> 复制</button>
-                            </div>
-                        </div>`;
-                });
-                loadItinerary();
-            }});
-        }
-
-        function copyAddress(t) {
-            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("✅ 地址已复制！");
         }
 
         function loadSettings() {
