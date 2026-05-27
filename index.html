@@ -12,101 +12,79 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        :root { --primary: #C41E3A; --bg: #F2F4F7; --card: #ffffff; --text: #2D3436; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #C41E3A; --bg: #F5F7FA; }
+        * { box-sizing: border-box; }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg); margin: 0 auto; max-width: 480px; color: var(--text);
-            padding-bottom: 120px; min-height: 100vh; position: relative;
+            background: var(--bg); margin: 0 auto; 
+            padding-bottom: 120px; 
+            color: #333; -webkit-tap-highlight-color: transparent; width: 100%; max-width: 480px; 
+            min-height: 100vh; position: relative;
         }
 
-        /* 🌟 移除 position: sticky，让 Header 可以随网页一起向上滚动隐藏 */
+        /* Header (随页面一起向上滚动) */
         header { 
-            background: #fff; padding: 20px; text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 10px solid var(--primary);
+            background: rgba(255, 255, 255, 0.98); padding: 15px 25px; 
+            border-top: 15px solid var(--primary); box-shadow: 0 4px 20px rgba(196, 30, 58, 0.08); 
         }
-        header h1 { margin: 0; font-size: 1.6rem; font-weight: 900; color: #1a1a1a; letter-spacing: -0.5px; }
-        .header-sub { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .header-sub p { margin: 0; font-size: 0.9rem; color: var(--primary); font-weight: bold; }
-        .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; text-align: left; }
+        header p { margin: 0; color: #888; font-size: 0.9rem; font-weight: 500; text-align: left; }
+        .credit-tag { font-size: 0.65rem; color: #ddd !important; font-style: italic; }
+        .banner-img { width: 100%; border-radius: 12px; margin-top: 15px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-        /* Tabs Logic */
-        .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 10px 0; }
+        .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* 记账模块样式 */
-        .expense-summary { 
-            background: linear-gradient(135deg, #C41E3A, #8E0E25); color: white; 
-            margin: 15px; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 20px rgba(196,30,58,0.2);
-        }
-        .total-amount { font-size: 2.2rem; font-weight: 900; margin: 8px 0; letter-spacing: -1px; }
-        .settlement-card { 
-            background: rgba(255,255,255,0.15); border-radius: 12px; padding: 12px; margin-top: 15px; 
-            text-align: left; font-size: 0.85rem; line-height: 1.6;
-        }
-        .settle-row { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.2); padding: 4px 0; }
-        .settle-row:last-child { border-bottom: none; }
+        /* 行程（完美还原旧版卡片视觉） */
+        .card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: none; text-align: left; }
+        .card-header { display: flex; height: 80px; cursor: pointer; transition: background 0.2s; }
+        .header-left { background: #BC002D; color: white; width: 70px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .day-num { font-size: 1.5rem; font-weight: 900; line-height: 1.1; }
+        .day-date { font-size: 0.75rem; font-weight: 500; opacity: 0.9; }
+        .header-right { flex: 1; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .day-title { font-size: 1.15rem; font-weight: 800; color: #222; padding-right: 10px; flex: 1; }
+        .toggle-icon { color: #ccc; transition: transform 0.3s ease; font-size: 1.1rem; }
+        .card.open .toggle-icon { transform: rotate(180deg); color: #BC002D; }
         
-        .input-card { background: #fff; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .form-input { 
-            flex: 1; padding: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; 
-            outline: none; background: #fdfdfd; font-weight: 600;
-        }
-        .btn-add { 
-            width: 100%; background: #1a1a1a; color: white; padding: 15px; border-radius: 12px; 
-            border: none; font-size: 1rem; font-weight: 800; cursor: pointer;
-        }
-
-        /* 列表项样式 */
-        .item-card { 
-            background: #fff; margin: 10px 15px; padding: 15px; border-radius: 12px; 
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0;
-        }
-        .item-info { display: flex; align-items: center; gap: 12px; }
-        .item-icon { 
-            width: 42px; height: 42px; border-radius: 10px; background: #FFF0F2; 
-            color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-        }
-        .item-meta { font-size: 0.75rem; color: #999; margin-top: 2px; }
-        .item-price { text-align: right; font-weight: 800; color: var(--primary); font-size: 1.1rem; }
-        .btn-del { border: none; background: none; color: #ddd; margin-left: 8px; font-size: 1.2rem; padding: 5px; cursor: pointer; }
-
-        /* 时间轴样式 (行程) */
-        .itinerary-card { background: #fff; margin: 12px 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .day-header { 
-            background: var(--primary); color: white; padding: 15px 20px; display: flex; 
-            justify-content: space-between; align-items: center; cursor: pointer;
-        }
-        .day-body { display: none; padding: 20px; background: #fff; }
-        .itinerary-card.open .day-body { display: block; }
-        .timeline-item { padding-left: 20px; border-left: 2px solid #f0f0f0; position: relative; padding-bottom: 20px; text-align: left; }
-        .timeline-item:last-child { padding-bottom: 0; border-left-color: transparent; }
-        .timeline-item::before { 
-            content: ''; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; 
-            background: #fff; border: 3px solid var(--primary); border-radius: 50%; 
-        }
+        /* 时间轴列表（展开后的精美排版） */
+        .card-body { display: none; padding: 25px 20px; border-top: 1px solid #f5f5f5; background: #fff; }
+        .card.open .card-body { display: block; }
+        .timeline-item { position: relative; padding-left: 25px; border-left: 2px solid #eee; padding-bottom: 25px; margin-left: 10px; text-align: left; }
+        .timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -7px; top: 4px; width: 10px; height: 10px; background: white; border: 3px solid #BC002D; border-radius: 50%; }
+        .event-time { color: #BC002D; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; display: block; font-family: monospace; }
+        .event-act { font-weight: 800; font-size: 1.05rem; color: #222; margin-bottom: 6px; }
+        .event-remark { background: #FFF0F5; border-left: 4px solid #BC002D; padding: 10px 12px; border-radius: 4px; font-size: 0.9rem; color: #555; line-height: 1.5; }
 
         /* 酒店样式 */
-        .hotel-card { background: #fff; margin: 15px; padding: 20px; border-radius: 15px; border-left: 6px solid #1565C0; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .hotel-tag { background: #E3F2FD; color: #1565C0; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; display: inline-block; }
-        
-        /* 其他清单样式 */
-        .other-card { background: #fff; margin: 12px 15px; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); border-left: 6px solid #2E7D32; text-align: left; }
-        .other-tag { background: #E8F5E9; color: #2E7D32; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; display: inline-block; }
+        .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); text-align: left; }
+        .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; background: #E3F2FD; color: #1565C0; }
+        .hotel-title { font-size: 1.15rem; font-weight: 800; color: #333; margin-bottom: 5px; }
+        .hotel-address-box { background: #F9FAFB; padding: 15px; border-radius: 8px; font-size: 0.95rem; color: #333; font-weight: 600; line-height: 1.6; margin-bottom: 10px; }
+        .btn-action { background: #BC002D; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
 
-        /* Tab Bar */
-        .nav-bar { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            width: 90%; background: #fff; border-radius: 40px; display: flex; padding: 6px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 2000;
-        }
-        .nav-item { 
-            flex: 1; text-align: center; color: #bbb; padding: 8px 0; border-radius: 30px; 
-            font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: 0.2s; line-height: 1.4;
-        }
+        /* 其他清单样式 */
+        .other-card { background: white; border-radius: 12px; margin: 15px; padding: 25px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: left; border-left: 5px solid #2E7D32; }
+        .other-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; background: #E8F5E9; color: #2E7D32; }
+
+        /* 记账页面样式 */
+        .expense-summary { background: linear-gradient(135deg, #C41E3A, #8E0E25); color: white; margin: 15px; padding: 20px; border-radius: 16px; text-align: center; box-shadow: 0 10px 20px rgba(196, 30, 58, 0.2); }
+        .total-amount { font-size: 2.2rem; font-weight: 800; margin: 5px 0; }
+        .settlement-card { background: rgba(0,0,0,0.15); border-radius: 12px; padding: 12px; margin-top: 15px; text-align: left; font-size: 0.85rem; line-height: 1.6; }
+        .settle-row { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.2); padding: 4px 0; }
+        .settle-row:last-child { border-bottom: none; }
+        .input-card { background: white; margin: 0 15px 20px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .form-input { flex: 1; padding: 12px; border: 1px solid #eee; border-radius: 8px; font-size: 1rem; outline: none; background: #fff; box-sizing: border-box; font-weight: 600; }
+        .btn-add { width: 100%; background: #1a1a1a; color: white; padding: 14px; border-radius: 10px; font-weight: 700; border: none; font-size: 1rem; cursor: pointer; }
+        .item-card { background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin: 0 15px 10px; border: 1px solid #f9f9f9; }
+        .btn-del { border: none; background: none; color: #ddd; margin-left: 10px; padding: 5px; cursor: pointer; font-size: 1.2rem; }
+
+        /* 底栏 Tab Bar */
+        .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; background: white; border-radius: 50px; display: flex; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 2000; }
+        .nav-item { flex: 1; text-align: center; color: #aaa; padding: 6px 0; border-radius: 30px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .nav-item.active { background: #FEE8EC; color: var(--primary); }
     </style>
 </head>
@@ -114,9 +92,9 @@
 
     <header>
         <h1 id="app-title">2027 Snowboard Trip</h1>
-        <div class="header-sub">
-            <p id="app-subtitle">4-MAR >>> 13-MAR</p>
-            <span style="font-size:0.65rem; color:#bbb; font-weight:bold;">XingKai Team</span>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <p id="app-subtitle">加载中...</p>
+            <span class="credit-tag">Created by XingKai</span>
         </div>
         <img src="banner.png" alt="Snowboard Banner" class="banner-img">
     </header>
@@ -131,24 +109,24 @@
 
     <div id="tab-expense" class="tab-content">
         <div class="expense-summary">
-            <div style="font-size:0.8rem; opacity:0.8;">团队共享总开销</div>
+            <div style="font-size:0.8rem; opacity:0.9;">团队共享总开销</div>
             <div class="total-amount" id="display-total">0 JPY</div>
-            <div id="rate-display" style="font-size:0.75rem; opacity:0.7;">参考汇率计算中...</div>
+            <div id="rate-display" style="font-size:0.75rem; opacity:0.8;">汇率读取中...</div>
             
             <div class="settlement-card" id="settle-box">
-                <div style="font-weight: 800; color: #FFD700; margin-bottom: 8px; text-align: center;"><i class="fas fa-balance-scale"></i> 8人实时对账单 (多退少补)</div>
+                <div style="color: #FFD700; font-weight: 800; margin-bottom: 6px; text-align: center;"><i class="fas fa-balance-scale"></i> 8人实时对账单 (基于均值多退少补)</div>
                 <div id="settle-text">等待数据输入...</div>
             </div>
             
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="copyReport()" style="flex:1; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:white; border-radius:20px; padding:8px; font-size:0.8rem; font-weight:700; cursor:pointer;">复制微信报告</button>
-                <button onclick="exportToCSV()" style="flex:1; background:rgba(46,125,50,0.9); border:none; color:white; border-radius:20px; padding:8px; font-size:0.8rem; font-weight:700; cursor:pointer;">导出 CSV</button>
+            <div style="display: flex; gap: 8px; justify-content: center; margin-top: 15px;">
+                <button onclick="copyReport()" style="flex:1; background:rgba(255, 255, 255, 0.2); border:1px solid rgba(255, 255, 255, 0.4); color:white; font-size:0.8rem; padding:8px; border-radius:20px; cursor:pointer; font-weight:bold;"><i class="fas fa-clipboard-list"></i> 复制微信报告</button>
+                <button onclick="exportToCSV()" style="flex:1; background:rgba(46, 125, 50, 0.9); border:none; color:white; font-size:0.8rem; padding:8px; border-radius:20px; cursor:pointer; font-weight:bold;"><i class="fas fa-file-csv"></i> 导出 CSV</button>
             </div>
         </div>
 
         <div class="input-card">
             <div class="form-row">
-                <select id="payer-input" class="form-input" style="color:var(--primary);"></select>
+                <select id="payer-input" class="form-input" style="color:var(--primary); background:#FFF0F2; border:1px solid #FDCED5;"></select>
                 <select id="type-input" class="form-input">
                     <option value="shared">👨‍👩‍👧‍👦 共享AA</option>
                     <option value="personal">👤 个人私账</option>
@@ -178,14 +156,13 @@
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('itinerary', this)"><span>📅</span><br>行程</div>
-        <div class="nav-item" onclick="switchTab('hotel', this)"><span>🏨</span><br>酒店</div>
-        <div class="nav-item" onclick="switchTab('expense', this)"><span>💰</span><br>记账</div>
-        <div class="nav-item" onclick="switchTab('other', this)"><span>🗂️</span><br>清单</div>
+        <div class="nav-item active" onclick="switchTab('itinerary', this)"><span>📅</span>行程</div>
+        <div class="nav-item" onclick="switchTab('hotel', this)"><span>🏨</span>酒店</div>
+        <div class="nav-item" onclick="switchTab('expense', this)"><span>💰</span>记账</div>
+        <div class="nav-item" onclick="switchTab('other', this)"><span>🗂️</span>清单</div>
     </nav>
 
     <script>
-        // 🔗 你的全新 Google Sheet 发布链接集合
         const urls = {
             itinerary: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1691826831&single=true&output=csv',
             hotel: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1862468067&single=true&output=csv',
@@ -195,7 +172,7 @@
 
         let friends = ["朋友A", "朋友B", "朋友C", "朋友D", "朋友E", "朋友F", "朋友G", "朋友H"];
         let config = { rate: 0.026, home: 'MYR' };
-        let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v3') || '[]');
+        let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_final') || '[]');
 
         window.onload = function() {
             loadSettings();
@@ -211,119 +188,119 @@
             el.classList.add('active');
         }
 
-        // === 1. 加载 8 人名字与设置 ===
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
                 if(data && data.length > 1) {
                     config.rate = parseFloat(data[1][2]) || 0.026;
                     let list = [];
-                    for(let i = 1; i < data.length; i++) {
+                    for(let i=1; i<data.length; i++) {
                         if(data[i][3]) list.push(data[i][3].trim());
                     }
                     if(list.length > 0) friends = list;
                 }
-                const payerSelect = document.getElementById('payer-input');
-                payerSelect.innerHTML = friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
+                document.getElementById('payer-input').innerHTML = friends.map(f => `<option value="${f}">${f}</option>`).join('');
                 renderExpenses();
             }});
         }
 
-        // === 2. 精准匹配你新 Sheet 的行程渲染 ===
+        // === 📅 完美还原：旧版卡片层级与新数据解析融合 ===
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
-                const data = res.data; 
+                const data = res.data;
                 const cont = document.getElementById('itinerary-container');
                 if(!data || data.length === 0) return;
-                
-                // 设置标题和副标题
+
                 if(data[0] && data[0][1]) document.getElementById('app-title').innerText = data[0][1];
                 if(data[2] && data[2][1]) document.getElementById('app-subtitle').innerText = data[2][1];
 
-                let days = new Map();
-                // 🚀 核心修改：从第 7 行开始抓取有效行程 (对应索引 6)
+                let daysMap = new Map();
+                // 从第 7 行开始处理实际行程数据 (对应数组索引 6)
                 data.slice(6).forEach((r) => {
                     if(!r || !r[1] || r[1].trim() === "") return;
-                    const dayKey = r[1].trim(); // 例如 "D0", "D1"
+                    const dayKey = r[1].trim(); // D0, D1, D2...
                     
-                    if(!days.has(dayKey)) {
-                        days.set(dayKey, { date: r[2] || '', title: r[4] || '', events: [] });
+                    if(!daysMap.has(dayKey)) {
+                        daysMap.set(dayKey, { date: r[2] || '', title: r[4] || '未命进行程', events: [] });
                     }
-                    // 抓取详细地点描述
-                    if (r[5] || r[6]) {
-                        days.get(dayKey).events.push({
+                    if(r[3] || r[5] || r[6]) {
+                        daysMap.get(dayKey).events.push({
                             time: r[3] || '全天',
-                            act: r[5] || r[4],
+                            act: r[5] || r[4] || '',
                             rem: r[6] || ''
                         });
                     }
                 });
 
                 cont.innerHTML = "";
-                days.forEach((v, k) => {
-                    let evs = v.events.map(e => `
+                daysMap.forEach((v, k) => {
+                    let evsHtml = v.events.map(e => `
                         <div class="timeline-item">
-                            <span class="event-time" style="font-weight:700; color:var(--primary); font-size:0.8rem;">🕒 ${e.time}</span>
-                            <div style="font-weight:800; font-size:1rem; margin:3px 0;">${e.act}</div>
-                            ${e.rem ? `<div style="font-size:0.8rem; color:#666; background:#FFF0F2; padding:8px; border-radius:6px; margin-top:4px;">${e.rem}</div>` : ''}
+                            <div class="timeline-dot"></div>
+                            <span class="event-time">${e.time}</span>
+                            <div class="event-act">${e.act}</div>
+                            ${e.rem ? `<div class="event-remark">${e.rem.replace(/\n/g, '<br>')}</div>` : ''}
                         </div>`).join('');
 
                     cont.innerHTML += `
-                        <div class="itinerary-card">
-                            <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
-                                <div><strong style="font-size:1.2rem;">${k}</strong> <span style="font-size:0.85rem; opacity:0.8; margin-left:8px;">(${v.date})</span></div>
-                                <div style="font-size:0.95rem; font-weight:700;">${v.title} <i class="fas fa-chevron-down" style="margin-left:5px;"></i></div>
+                        <div class="card">
+                            <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
+                                <div class="header-left">
+                                    <div class="day-num">${k}</div>
+                                    <div class="day-date">${v.date}</div>
+                                </div>
+                                <div class="header-right">
+                                    <div class="day-title">${v.title}</div>
+                                    <i class="fas fa-chevron-down toggle-icon"></i>
+                                </div>
                             </div>
-                            <div class="day-body">${evs || '<div style="color:#aaa; font-size:0.85rem;">暂无详细活动安排</div>'}</div>
+                            <div class="card-body">${evsHtml || '<div style="color:#aaa;text-align:center;">暂无活动明细</div>'}</div>
                         </div>`;
                 });
             }});
         }
 
-        // === 3. 精准匹配新 Sheet 的酒店渲染 ===
+        // === 🏨 酒店渲染 ===
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
-                const data = res.data; 
+                const data = res.data;
                 const cont = document.getElementById('hotel-container');
                 if(!data) return;
                 cont.innerHTML = "";
-                
                 data.slice(1).forEach(h => {
                     if(!h || !h[2] || h[2].trim() === "") return;
                     cont.innerHTML += `
                         <div class="hotel-card">
                             <span class="hotel-tag"><i class="fas fa-bed"></i> ${h[4] || '住宿'}</span>
-                            <div style="font-weight:900; font-size:1.15rem; margin:10px 0; color:#1a1a1a;">${h[1] || ''} : ${h[2]}</div>
-                            <div style="font-size:0.85rem; color:#555; background:#f7f9fa; padding:10px; border-radius:8px; margin-bottom:12px; font-weight:600;">📍 ${h[3] || '暂无地址'}</div>
-                            ${h[6] && h[6].startsWith('http') ? `<a href="${h[6]}" class="btn-action" target="_blank"><i class="fas fa-location-arrow"></i> Google 导航前往</a>` : ''}
+                            <div class="hotel-title">${h[1] || ''} : ${h[2]}</div>
+                            <div style="font-size:0.8rem; color:#999; margin-bottom:10px;">${h[0]||''}</div>
+                            <div class="hotel-address-box">${h[3] || '暂无地址'}</div>
+                            ${h[6] && h[6].startsWith('http') ? `<a href="${h[6]}" class="btn-action" target="_blank"><i class="fas fa-location-arrow"></i> 导航前往</a>` : ''}
                         </div>`;
                 });
-                if(cont.innerHTML === "") cont.innerHTML = '<div style="text-align:center;color:#999;padding:40px;">暂无酒店入住数据</div>';
             }});
         }
 
-        // === 4. 精准匹配新 Sheet 的清单渲染 ===
+        // === 🗂️ 清单渲染 ===
         function loadOthers() {
             Papa.parse(urls.other, { download: true, complete: (res) => {
-                const data = res.data; 
+                const data = res.data;
                 const cont = document.getElementById('other-container');
                 if(!data) return;
                 cont.innerHTML = "";
-                
                 data.slice(1).forEach(o => {
                     if(!o || !o[2] || o[2].trim() === "") return;
                     cont.innerHTML += `
                         <div class="other-card">
                             <span class="other-tag"><i class="fas fa-bookmark"></i> ${o[0] || '清单'}</span>
-                            <div style="font-weight:800; font-size:1.1rem; margin:8px 0;">${o[2]}</div>
+                            <div style="font-weight:800; font-size:1.1rem; margin:8px 0; color:#222;">${o[2]}</div>
                             ${o[3] ? `<div style="font-size:0.85rem; color:#666;">📝 备注: ${o[3]}</div>` : ''}
                         </div>`;
                 });
-                if(cont.innerHTML === "") cont.innerHTML = '<div style="text-align:center;color:#999;padding:40px;">暂无清单备忘数据</div>';
             }});
         }
 
-        // === 5. 记账、算账与删除逻辑 ===
+        // === 💰 记账核心逻辑 ===
         function addExpense() {
             const amt = parseFloat(document.getElementById('amt-input').value);
             const note = document.getElementById('note-input').value;
@@ -345,7 +322,7 @@
             };
             
             expenses.unshift(newEx);
-            localStorage.setItem('snow_trip_2027_v3', JSON.stringify(expenses));
+            localStorage.setItem('snow_trip_2027_final', JSON.stringify(expenses));
             document.getElementById('amt-input').value = '';
             document.getElementById('note-input').value = '';
             renderExpenses();
@@ -357,7 +334,7 @@
             friends.forEach(f => paidMap[f] = 0);
 
             const listCont = document.getElementById('expense-list');
-            if(listCont) listCont.innerHTML = '';
+            listCont.innerHTML = '';
 
             expenses.forEach(e => {
                 if(e.type === 'shared') {
@@ -365,30 +342,27 @@
                     if(paidMap[e.payer] !== undefined) paidMap[e.payer] += e.amount;
                 }
 
-                if(listCont) {
-                    listCont.innerHTML += `
-                        <div class="item-card">
-                            <div class="item-info">
-                                <div class="item-icon"><i class="fas fa-money-bill-wave"></i></div>
-                                <div>
-                                    <div style="font-weight:700;color:#333;">${e.note}</div>
-                                    <div class="item-meta">${e.date} ${e.time} • <strong>${e.payer}</strong> ${e.type==='shared'?'<span style="color:var(--primary)">[全员AA]</span>':'<span style="color:#888">[私账]</span>'}</div>
-                                </div>
+                listCont.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-icon"><i class="fas fa-receipt"></i></div>
+                            <div>
+                                <div style="font-weight:700;color:#333;">${e.note}</div>
+                                <div class="item-meta">${e.date} ${e.time} • <strong>${e.payer}</strong> ${e.type==='shared'?'<span style="color:var(--primary)">[AA平摊]</span>':'<span style="color:#777">[个人账]</span>'}</div>
                             </div>
-                            <div class="item-price">
-                                ${e.amount.toLocaleString()} JPY
-                                <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
-                            </div>
-                        </div>`;
-                }
+                        </div>
+                        <div class="item-price">
+                            ${e.amount.toLocaleString()} JPY
+                            <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
+                        </div>
+                    </div>`;
             });
 
             document.getElementById('display-total').innerText = totalShared.toLocaleString() + ' JPY';
             document.getElementById('rate-display').innerText = `参考汇率: 1 JPY = ${config.rate} ${config.home}`;
 
-            // 8 人绝对值平摊对账算法
             const avg = totalShared / friends.length;
-            let settleHtml = `<div style="padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.2); margin-bottom:8px; font-weight:bold; font-size:0.8rem; opacity:0.8;">人均应负担: ${Math.round(avg).toLocaleString()} JPY</div>`;
+            let settleHtml = `<div style="padding-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.2); margin-bottom:8px; font-weight:bold; font-size:0.8rem; opacity:0.8;">人均分摊费用: ${Math.round(avg).toLocaleString()} JPY</div>`;
             
             friends.forEach(f => {
                 const diff = paidMap[f] - avg;
@@ -406,7 +380,7 @@
         function deleteEx(id) {
             if(confirm("确定删除这一笔账目吗?")) {
                 expenses = expenses.filter(e => e.id !== id);
-                localStorage.setItem('snow_trip_2027_v3', JSON.stringify(expenses));
+                localStorage.setItem('snow_trip_2027_final', JSON.stringify(expenses));
                 renderExpenses();
             }
         }
@@ -415,15 +389,15 @@
             let report = `🧾 2027 滑雪局实时对账单 (${new Date().toLocaleDateString()})\n------------------------\n`;
             report += `💰 共享总支出: ${document.getElementById('display-total').innerText}\n`;
             report += `👥 人均分摊费用: ${Math.round(expenses.reduce((s,e)=>s+(e.type==='shared'?e.amount:0),0)/friends.length).toLocaleString()} JPY\n------------------------\n`;
-            report += `⚖️ 【全员收退补款结算】\n` + document.getElementById('settle-text').innerText.replace(/🟢|🔴|⚪/g, '').replace(/人均应付[\s\S]*?JPY/g, '');
-            report += `\n少付的朋友转账给多付的朋友即可！\nGenerated by XK Friends Travel App`;
+            report += `⚖️ 【全员退补结算】\n` + document.getElementById('settle-text').innerText.replace(/🟢|🔴|⚪/g, '').replace(/人均分摊[\s\S]*?JPY/g, '');
+            report += `\n少付的朋友直接转给多付的朋友即可！\nGenerated by XK Friends Travel App`;
             
             const el = document.createElement('textarea'); el.value = report; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("✅ 8人收退报告已复制！快去粘贴到群里让大家对账吧。");
+            alert("✅ 8人收退报告已复制！");
         }
 
         function exportToCSV() {
-            if (expenses.length === 0) return alert("还没有记账记录");
+            if (expenses.length === 0) return alert("无账目记录");
             let exportData = expenses.map(e => ({
                 "日期": e.date, "时间": e.time, "账目分类": e.cat, "明细/备注": e.note, "付款人": e.payer, "类型": e.type==='shared'?'全员AA':'个人私账', "金额(JPY)": e.amount
             }));
@@ -431,9 +405,8 @@
             const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "2027_Snowboard_Trip_Expenses.csv";
-            link.style.visibility = 'hidden'; document.body.appendChild(link);
-            link.click(); document.body.removeChild(link);
+            link.download = "2027_Snowboard_Expenses.csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
     </script>
 </body>
