@@ -35,35 +35,16 @@
             padding-bottom: 4px;
         }
         
-        /* 元数据行：增加支持容纳快捷链接的布局 */
         .header-meta-row { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             margin-top: 12px; 
-            padding: 0 2px;
-            gap: 6px;
+            padding: 0 4px;
         }
-        .date-input-container { display: flex; align-items: center; gap: 4px; }
-        .date-editable { border: none; background: #F5F7FA; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; color: var(--primary); width: 145px; outline: none; }
-        
-        /* 🌟 新增的 Google Sheet 快速访问快捷标签样式 */
-        .sheet-ref-link {
-            font-size: 0.7rem;
-            color: #2e7d32;
-            background: #e8f5e9;
-            padding: 4px 8px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            transition: background 0.2s;
-        }
-        .sheet-ref-link:active { background: #c8e6c9; }
-
-        .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; white-space: nowrap; }
+        .date-input-container { display: flex; align-items: center; gap: 5px; flex: 1; }
+        .date-editable { border: none; background: #F5F7FA; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary); width: 160px; outline: none; }
+        .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; }
         .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
@@ -89,7 +70,15 @@
         .event-time { color: var(--primary); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px; }
         .event-act { font-weight: 800; font-size: 1.05rem; color: #111; margin-bottom: 6px; }
         .event-remark-box { background: var(--remark-bg); padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #444; line-height: 1.5; margin-bottom: 10px; border-left: 3px solid var(--primary); }
+        
+        /* 按钮容器：让路线和攻略并排显示 */
+        .event-btns-row { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
+        
         .btn-map-small { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        
+        /* 🌟 新增：Reference Link 攻略链接按钮样式（粉色元气感） */
+        .btn-ref-small { background: #FFEBEE; color: #C41E3A; border: 1px solid #FFCDD2; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: background 0.2s; }
+        .btn-ref-small:active { background: #FFCDD2; }
 
         /* --- 🏨 酒店 Tab 专属样式 --- */
         .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: left; }
@@ -106,8 +95,6 @@
         .input-card { background: white; margin: 0 15px 20px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .form-input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; font-size: 1rem; font-weight: 600; }
         .btn-submit { width: 100%; background: #1a1a1a; color: white; padding: 14px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; }
-        
-        /* 优化后的历史账单卡片视觉 */
         .expense-item-card { background: white; margin: 0 15px 10px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.02); }
 
         /* 底栏 Tab Bar */
@@ -122,14 +109,9 @@
         <h1>2027 日本滑雪之旅 JAPAN TRIP</h1>
         <div class="header-meta-row">
             <div class="date-input-container">
-                <span style="font-size:0.8rem;">📅</span>
+                <span style="font-size:0.85rem;">📅</span>
                 <input type="text" id="editable-date" class="date-editable" placeholder="输入日期..." oninput="saveTripDate(this.value)">
             </div>
-            
-            <a href="https://docs.google.com/spreadsheets/d/1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/edit" target="_blank" class="sheet-ref-link">
-                <i class="fas fa-table"></i> 原始表格
-            </a>
-
             <div class="credit-tag">Created by XingKai</div>
         </div>
         <img src="banner.png" alt="Snowboard Banner" class="banner-img">
@@ -210,7 +192,13 @@
                         daysMap.set(dayKey, { dayNum: dayKey, dateLabel: r[1] || '', mainTitle: r[3] || '', events: [] });
                     }
                     if(r[4]) {
-                        daysMap.get(dayKey).events.push({ time: r[2] || '', act: r[4] || '', rem: r[5] || '', map: r[6] || '' });
+                        daysMap.get(dayKey).events.push({
+                            time: r[2] || '',  // C列: Time
+                            act: r[4] || '',   // E列: Activity
+                            rem: r[5] || '',   // F列: Remarks
+                            map: r[6] || '',   // G列: Map Link
+                            ref: r[7] || ''    // 🌟 H列: Reference Link (Index 7)
+                        });
                     }
                 });
 
@@ -222,7 +210,11 @@
                             <span class="event-time">${e.time}</span>
                             <div class="event-act">${e.act}</div>
                             ${e.rem ? `<div class="event-remark-box">${e.rem.replace(/\n/g, '<br>')}</div>` : ''}
-                            ${e.map && e.map.startsWith('http') ? `<a href="${e.map}" target="_blank" class="btn-map-small"><i class="fas fa-route"></i> 路线</a>` : ''}
+                            
+                            <div class="event-btns-row">
+                                ${e.map && e.map.startsWith('http') ? `<a href="${e.map}" target="_blank" class="btn-map-small"><i class="fas fa-route"></i> 路线</a>` : ''}
+                                ${e.ref && e.ref.startsWith('http') ? `<a href="${e.ref}" target="_blank" class="btn-ref-small"><i class="fas fa-link"></i> 攻略</a>` : ''}
+                            </div>
                         </div>`).join('');
 
                     cont.innerHTML += `
