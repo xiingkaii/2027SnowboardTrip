@@ -34,14 +34,7 @@
             text-shadow: 0px 1px 0px #90CAF9, 0px 2px 0px #64B5F6, 0px 3px 0px #42A5F5, 0px 3px 6px rgba(13, 71, 161, 0.3);
             padding-bottom: 4px;
         }
-        
-        .header-meta-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-top: 12px; 
-            padding: 0 4px;
-        }
+        .header-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 0 4px; }
         .date-input-container { display: flex; align-items: center; gap: 5px; flex: 1; }
         .date-editable { border: none; background: #F5F7FA; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary); width: 160px; outline: none; }
         .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; }
@@ -51,7 +44,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 📅 行程 Tab 专属样式（已完美修复类名对齐） --- */
+        /* --- 📅 行程 Tab 专属样式 --- */
         .itinerary-card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .itinerary-header { display: flex; height: 75px; cursor: pointer; align-items: stretch; }
         .itinerary-day-box { background: var(--dark-red); color: white; width: 75px; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0; }
@@ -90,13 +83,46 @@
         .btn-nav-large { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 10px rgba(188, 0, 45, 0.15); border: none; }
         .btn-copy-large { flex: 1; background: #EAEAEA; color: #333; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* --- 💰 记账 Tab 样式 --- */
-        .expense-header { background: linear-gradient(135deg, #C41E3A, #8E0E25); color: white; padding: 25px; margin: 15px; border-radius: 16px; text-align: center; }
-        .total-num { font-size: 2.2rem; font-weight: 800; }
-        .input-card { background: white; margin: 0 15px 20px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; font-size: 1rem; font-weight: 600; }
-        .btn-submit { width: 100%; background: #1a1a1a; color: white; padding: 14px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; }
-        .expense-item-card { background: white; margin: 0 15px 10px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.02); }
+        /* --- 💰 记账 Tab (阿公钱 Pool 金库专属美化) --- */
+        .pool-panel { 
+            background: #BC002D; color: white; 
+            margin: 15px; padding: 22px 20px; border-radius: 20px; text-align: center; 
+            box-shadow: 0 10px 25px rgba(188,0,45,0.25); 
+        }
+        .pool-label-badge { background: white; color: var(--dark-red); padding: 3px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 900; display: inline-block; margin-bottom: 4px; }
+        .pool-amount-display { font-size: 2.6rem; font-weight: 900; margin: 4px 0; letter-spacing: -1px; }
+        
+        /* 内置 8人成员公账出资明细卡 */
+        .pool-members-box { 
+            background: rgba(0,0,0,0.15); border-radius: 14px; padding: 14px 16px; margin-top: 15px; 
+            text-align: left;
+        }
+        .pool-member-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding: 8px 0; font-size: 0.9rem; font-weight: 700; }
+        .pool-member-row:last-child { border-bottom: none; }
+        .member-name-tag { display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #00FF00; }
+
+        /* 基础操作区 */
+        .input-card { background: white; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .form-input { 
+            width: 100%; padding: 12px; border: 1px solid #EAEAEA; border-radius: 10px; font-size: 0.95rem; 
+            outline: none; background: #FAFAFA; font-weight: 700; color: #333; transition: all 0.2s;
+        }
+        .form-input:focus { background: white; border-color: var(--primary); }
+        .btn-add { 
+            width: 100%; background: #1A1A1A; color: white; padding: 15px; border-radius: 12px; 
+            border: none; font-size: 1rem; font-weight: 800; cursor: pointer;
+        }
+
+        .expense-item-card { 
+            background: white; margin: 0 15px 12px; padding: 15px 18px; border-radius: 12px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; 
+            align-items: center; border: 1px solid rgba(0,0,0,0.01); 
+        }
+        .expense-icon-box { width: 40px; height: 40px; border-radius: 10px; background: #FFF0F2; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 12px; }
+        .expense-item-price { font-size: 1.15rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 4px; }
+        .btn-del { border: none; background: none; color: #CCC; font-size: 1.3rem; padding-left: 6px; cursor: pointer; }
 
         /* 底栏 Tab Bar */
         .tab-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: white; border-radius: 50px; display: flex; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; }
@@ -127,21 +153,43 @@
     </div>
 
     <div id="tab-expense" class="tab-content">
-        <div class="expense-header">
-            <div style="font-size:0.8rem; opacity:0.9;">团队共享总开销</div>
-            <div class="total-num" id="display-total">0 JPY</div>
-            <div id="settle-text" style="margin-top:10px; font-size:0.85rem; background:rgba(0,0,0,0.1); padding:10px; border-radius:10px;"></div>
+        <div class="pool-panel">
+            <span class="pool-label-badge">阿公钱 余额</span>
+            <div class="pool-amount-display" id="pool-remaining">0 JPY</div>
+            <div id="rate-display" style="font-size:0.75rem; opacity:0.8; font-weight:500; margin-top:2px;">汇率同步中...</div>
+            
+            <div class="pool-members-box">
+                <div style="font-weight: 800; color: #FFD700; margin-bottom: 10px; text-align: center; font-size: 0.85rem;"><i class="fas fa-wallet"></i> 团队 8 人公账实时账户</div>
+                <div id="members-list-container"></div>
+            </div>
         </div>
+
         <div class="input-card">
-            <select id="payer-input" class="form-input"></select>
-            <select id="type-input" class="form-input">
-                <option value="shared">👨‍👩‍👧‍👦 共享AA</option>
-                <option value="personal">👤 个人私账</option>
-            </select>
-            <input type="number" id="amt-input" class="form-input" placeholder="金额 (JPY)">
-            <input type="text" id="note-input" class="form-input" placeholder="备注: 如 居酒屋晚餐">
-            <button class="btn-submit" onclick="addExpense()">+ 记一笔</button>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 记账类型说明：选择“共享AA”将直接扣除阿公钱余额</div>
+            <div class="form-row">
+                <select id="payer-input" class="form-input" style="color:var(--primary); background:#FFF0F2; border:1px solid #FFCDD2;"></select>
+                <select id="type-input" class="form-input">
+                    <option value="shared">👨‍👩‍👧‍👦 共享AA (扣公款)</option>
+                    <option value="personal">👤 个人充值/私账</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <input type="number" id="amt-input" class="form-input" placeholder="金额 (JPY)">
+                <select id="cat-input" class="form-input">
+                    <option value="Food">🍔 餐饮</option>
+                    <option value="Transport">🚄 交通</option>
+                    <option value="Ticket">🎫 雪票/门票</option>
+                    <option value="Rental">🏂 租赁</option>
+                    <option value="Shopping">🛍️ 购物</option>
+                    <option value="Others">🧩 其他</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <input type="text" id="note-input" class="form-input" placeholder="备注: 如 预收公款/居酒屋">
+            </div>
+            <button class="btn-add" onclick="addExpense()">+ 记一笔</button>
         </div>
+        
         <div id="expense-list"></div>
     </div>
 
@@ -158,8 +206,10 @@
             settings: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1064984576&single=true&output=csv'
         };
 
-        let friends = ["朋友A", "朋友B", "朋友C", "朋友D", "朋友E", "朋友F", "朋友G", "朋友H"];
-        let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v5') || '[]');
+        // 默认 8 人名字
+        let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
+        let config = { rate: 0.026, home: 'MYR' };
+        let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v1') || '[]');
 
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
@@ -185,31 +235,20 @@
                 const cont = document.getElementById('hotel-container');
                 if(!data) return;
                 cont.innerHTML = "";
-                
                 data.slice(1).forEach(h => {
                     if(!h || !h[2] || h[2].trim() === "") return;
-                    
                     const tag = h[4] || '住宿';
                     const isAirbnb = tag.toLowerCase().includes('airbnb');
                     const tagClass = isAirbnb ? 'tag-airbnb' : 'tag-hotel';
                     const addr = h[3] || '暂无地址';
                     const remark = h[5] ? `<div class="hotel-remark-text">${h[5].replace(/\n/g, '<br>')}</div>` : '';
                     const mapLink = h[6] || '';
-                    
                     cont.innerHTML += `
                         <div class="hotel-card">
                             <span class="hotel-tag ${tagClass}">${tag}</span>
-                            <div class="hotel-title-row">
-                                <i class="fas fa-map-marker-alt hotel-icon-pin"></i>
-                                <div class="hotel-title-text">${h[1]}：${h[2]}</div>
-                            </div>
+                            <div class="hotel-title-row"><i class="fas fa-map-marker-alt hotel-icon-pin"></i><div class="hotel-title-text">${h[1]}：${h[2]}</div></div>
                             <div class="hotel-date-text">${h[0] || ''}</div>
-                            
-                            <div class="hotel-content-container">
-                                <div class="hotel-address-text">${addr}</div>
-                                ${remark}
-                            </div>
-                            
+                            <div class="hotel-content-container"><div class="hotel-address-text">${addr}</div>${remark}</div>
                             <div class="hotel-action-buttons">
                                 ${mapLink ? `<a href="${mapLink}" target="_blank" class="btn-nav-large"><i class="fas fa-paper-plane"></i> 导航前往</a>` : '<button class="btn-nav-large" disabled>暂无位置</button>'}
                                 <button class="btn-copy-large" onclick="copyAddress('${addr.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> 复制地址</button>
@@ -225,13 +264,12 @@
             alert("✅ 地址已复制！");
         }
 
-        // --- 📅 行程数据加载（修复 class="card" 为 class="itinerary-card"） ---
+        // --- 📅 行程 Tab 加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
                 const cont = document.getElementById('itinerary-container');
                 if(!data) return;
-
                 let daysMap = new Map();
                 data.slice(6).forEach((r) => {
                     if(!r || !r[0] || r[0].trim() === "") return;
@@ -241,7 +279,6 @@
                         daysMap.get(dayKey).events.push({ time: r[2] || '', act: r[4] || '', rem: r[5] || '', map: r[6] || '', ref: r[7] || '' });
                     }
                 });
-
                 cont.innerHTML = "";
                 daysMap.forEach((v) => {
                     let eventsHtml = v.events.map(e => `
@@ -255,7 +292,6 @@
                                 ${e.ref && e.ref.startsWith('http') ? `<a href="${e.ref}" target="_blank" class="btn-ref-small"><i class="fas fa-link"></i> 攻略</a>` : ''}
                             </div>
                         </div>`).join('');
-
                     cont.innerHTML += `
                         <div class="itinerary-card">
                             <div class="itinerary-header" onclick="this.parentElement.classList.toggle('open')">
@@ -268,39 +304,166 @@
             }});
         }
 
+        // --- 💰 记账 Tab (金库 Pool 计算逻辑) ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
-                if(res.data.length > 1) friends = res.data.slice(1).map(r => r[3]).filter(n => n);
-                document.getElementById('payer-input').innerHTML = friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
+                const data = res.data;
+                if(data && data.length > 1) {
+                    config.rate = parseFloat(data[1][2]) || 0.026;
+                    config.home = data[1][1] || 'MYR';
+                    let list = [];
+                    for(let i=1; i<data.length; i++) {
+                        if(data[i][3]) list.push(data[i][3].trim());
+                    }
+                    if(list.length > 0) friends = list;
+                }
+                document.getElementById('payer-input').innerHTML = friends.map(f => `<option value="${f}">${f}</option>`).join('');
+                
+                // 🚀 初始化：如果本地完全没有账目，自动为 8 个人各注入 10,000 JPY 初始公款作为阿公钱 Pool
+                if (expenses.length === 0) {
+                    friends.forEach(f => {
+                        expenses.push({
+                            id: Date.now() + Math.random(),
+                            amount: 10000,
+                            note: "初始预交公款",
+                            payer: f,
+                            type: "personal", // 标记为充值/注入公款，不计入共享AA扣除
+                            cat: "Others"
+                        });
+                    });
+                    localStorage.setItem('snow_trip_pool_v1', JSON.stringify(expenses));
+                }
                 renderExpenses();
             }});
         }
 
         function addExpense() {
             const amt = parseFloat(document.getElementById('amt-input').value);
+            const note = document.getElementById('note-input').value;
+            const payer = document.getElementById('payer-input').value;
+            const type = document.getElementById('type-input').value;
+            const cat = document.getElementById('cat-input').value;
+
             if(!amt) return alert("请输入金额");
-            expenses.unshift({ id: Date.now(), amount: amt, note: document.getElementById('note-input').value, payer: document.getElementById('payer-input').value, type: document.getElementById('type-input').value });
-            localStorage.setItem('snow_trip_2027_v5', JSON.stringify(expenses));
-            renderExpenses();
+            
+            expenses.unshift({
+                id: Date.now(),
+                amount: amt,
+                note: note || (type==='shared'?'共享开销': '预交公款充值'),
+                payer: payer,
+                type: type,
+                cat: cat
+            });
+            localStorage.setItem('snow_trip_pool_v1', JSON.stringify(expenses));
             document.getElementById('amt-input').value = '';
             document.getElementById('note-input').value = '';
+            renderExpenses();
+        }
+
+        function deleteEx(id) {
+            if(confirm("确定删除这笔账目记录吗?")) {
+                expenses = expenses.filter(e => e.id !== id);
+                localStorage.setItem('snow_trip_pool_v1', JSON.stringify(expenses));
+                renderExpenses();
+            }
         }
 
         function renderExpenses() {
-            let total = 0, paidMap = {};
-            friends.forEach(f => paidMap[f] = 0);
-            expenses.forEach(e => { if(e.type==='shared') { total += e.amount; paidMap[e.payer] += e.amount; }});
-            document.getElementById('display-total').innerText = total.toLocaleString() + ' JPY';
-            const avg = total / friends.length;
-            document.getElementById('settle-text').innerHTML = friends.map(f => {
-                const bal = paidMap[f] - avg;
-                return `<div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:2px 0;"><span>${f}</span><strong>${bal>=0?'+':''}${Math.round(bal).toLocaleString()}</strong></div>`;
-            }).join('');
-            document.getElementById('expense-list').innerHTML = expenses.map(e => `
-                <div class="expense-item-card">
-                    <div><strong>${e.note || '未命名账目'}</strong><br><small style="color:#888;">${e.payer} • ${e.type==='shared'?'共享AA':'个人私账'}</small></div>
-                    <div style="text-align:right; font-weight:800; color:var(--primary);">${e.amount.toLocaleString()} JPY</div>
-                </div>`).join('');
+            let initialPoolTotal = 0; // 累计注入的阿公钱总额
+            let totalSpentFromPool = 0; // 累计共享AA花掉的总金额
+            
+            // 8人个人追踪字典
+            let memberDepositMap = {};
+            let memberSpentMap = {};
+            friends.forEach(f => { memberDepositMap[f] = 0; memberSpentMap[f] = 0; });
+
+            const listCont = document.getElementById('expense-list');
+            listCont.innerHTML = '';
+
+            expenses.forEach(e => {
+                // 计算充值和共享扣除
+                if (e.type === 'personal') {
+                    // 充值注入公款
+                    initialPoolTotal += e.amount;
+                    if(memberDepositMap[e.payer] !== undefined) memberDepositMap[e.payer] += e.amount;
+                } else if (e.type === 'shared') {
+                    // 共享AA开销，直接从公款扣除
+                    totalSpentFromPool += e.amount;
+                }
+
+                // 历史记录渲染
+                listCont.innerHTML += `
+                    <div class="expense-item-card">
+                        <div style="display:flex; align-items:center;">
+                            <div class="expense-icon-box">
+                                <i class="${e.type==='shared'?'fas fa-shopping-basket':'fas fa-vault'}"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note}</div>
+                                <div style="font-size:0.75rem; color:#888; margin-top:2px;">
+                                    经手人: <strong>${e.payer}</strong> • ${e.type==='shared'?'<span style="color:var(--primary); font-weight:700;">[扣除阿公钱]</span>':'<span style="color:#2E7D32; font-weight:700;">[公款池注入/私账]</span>'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="expense-item-price">
+                            <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
+                            <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
+                        </div>
+                    </div>`;
+            });
+
+            // 阿公钱余额 = 注入总和 - 花费总和
+            let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
+            
+            document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
+            document.getElementById('rate-display').innerText = `阿公钱剩余折合: ${Math.round(currentPoolBalance * config.rate).toLocaleString()} ${config.home} (汇率: ${config.rate})`;
+
+            // 计算全员人均消费，用以在底座展示平摊数
+            const perPersonSpent = totalSpentFromPool / friends.length;
+
+            // 完美还原截图底座：渲染 8 人每个人在公账池的状态
+            let membersHtml = '';
+            friends.forEach(f => {
+                // 每个人的状况 = 累计预交金额 - 全员人均已消费额
+                let myStatus = memberDepositMap[f] - perPersonSpent;
+                let sign = myStatus >= 0 ? '+' : '';
+                let color = myStatus >= 0 ? '#00FF00' : '#FFAAAA';
+                
+                membersHtml += `
+                    <div class="pool-member-row">
+                        <div class="member-name-tag">
+                            <div class="status-dot" style="background:${myStatus >= 0 ? '#00FF00' : '#BC002D'};"></div>
+                            <strong>${f}</strong>
+                        </div>
+                        <span style="color:${color}; font-weight:bold;">
+                            交了 ${memberDepositMap[f].toLocaleString()} (余 ${sign}${Math.round(myStatus).toLocaleString()})
+                        </span>
+                    </div>`;
+            });
+            document.getElementById('members-list-container').innerHTML = membersHtml;
+        }
+
+        function copyReport() {
+            let report = `🧾 2027 滑雪局【阿公钱金库 Pool】实时账单报告\n--------------------------------------\n`;
+            report += `💰 当前阿公钱总余额: ${document.getElementById('pool-remaining').innerText}\n`;
+            report += `📊 团队公账折合: ${document.getElementById('rate-display').innerText}\n`;
+            report += `--------------------------------------\n👥 8人公账池明细 (充值总额与当前盈余):\n`;
+            report += document.getElementById('members-list-container').innerText.replace(/交了/g, ' 累计已交:').replace(/\(余/g, ' / 当前可用额:');
+            report += `\n余额不足时，大家继续按需充值注入即可！\nGenerated by XK Friends Travel App`;
+            
+            const el = document.createElement('textarea'); el.value = report; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert("✅ 阿公钱金库报告已复制！快发到群里让大家看看余额。");
+        }
+
+        function exportToCSV() {
+            if (expenses.length === 0) return alert("暂无记账数据");
+            let exportData = expenses.map(e => ({
+                "明细备注": e.note, "经手人": e.payer, "类型": e.type==='shared'?'共享AA扣公款':'公房充值/个人', "金额(JPY)": e.amount
+            }));
+            const csv = Papa.unparse(exportData);
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "阿公钱_Pool_Expenses.csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
     </script>
 </body>
