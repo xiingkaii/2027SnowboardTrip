@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        :root { --primary: #C41E3A; --bg: #F5F7FA; --dark-red: #BC002D; --dark-blue: #0D47A1; --remark-bg: #FFF0F2; }
+        :root { --primary: #C41E3A; --bg: #F5F7FA; --dark-red: #BC002D; --dark-blue: #0D47A1; --remark-bg: #FFF0F2; --orange: #FF9800; }
         * { box-sizing: border-box; }
         
         body { 
@@ -116,7 +116,11 @@
             background: white; margin: 0 15px 12px; padding: 15px 18px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.01); 
         }
         .expense-icon-box { width: 40px; height: 40px; border-radius: 10px; background: #FFF0F2; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 12px; }
+        
+        /* 💸 核心设计修改：共享消费用红字，独立个人私账用充满活力的橙色，且绝不被割 */
         .expense-item-price { font-size: 1.15rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 4px; }
+        .expense-item-price.personal-cost-style { color: var(--orange) !important; }
+
         .btn-del { border: none; background: none; color: #CCC; font-size: 1.3rem; padding-left: 6px; cursor: pointer; }
 
         /* 底栏 Tab Bar */
@@ -211,16 +215,9 @@
         let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
         let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v3') || '[]');
 
-        // 🌟 完美修复：将文件名映射字典修改为和 GitHub 完全一致的“大写形式”
         const avatarMaps = {
-            "XK": "XK.png",
-            "YM": "YM.png",
-            "JY": "JY.png",
-            "JP": "JP.png",
-            "WS": "WS.png",
-            "Patric": "Patric.png",
-            "CY": "CY.png",
-            "ZK": "ZK.png"
+            "XK": "XK.png", "YM": "YM.png", "JY": "JY.png", "JP": "JP.png",
+            "WS": "WS.png", "Patric": "Patric.png", "CY": "CY.png", "ZK": "ZK.png"
         };
 
         const avatarBgColors = {
@@ -430,8 +427,17 @@
             const listCont = document.getElementById('expense-list');
             listCont.innerHTML = '';
 
+            // 🌟 核心修复 1：智能双重倒序排序引擎（优先消费日期从新到旧，同天内按创建时间戳从新到旧）
+            expenses.sort((a, b) => {
+                if (a.date !== b.date) {
+                    return new Date(b.date) - new Date(a.date);
+                }
+                return b.id - a.id; 
+            });
+
             expenses.forEach(e => {
                 let badgeText = '';
+                let isIndividual = false;
                 
                 if (e.type === 'personal') {
                     initialPoolTotal += e.amount;
@@ -446,7 +452,8 @@
                     });
                     badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${poolInvolvedList.length}人]</span>`;
                 } else if (e.type === 'individual_cost') {
-                    badgeText = '<span style="color:#7F8C8D; font-weight:700;">🔒 [个人私账 • 独立]</span>';
+                    isIndividual = true;
+                    badgeText = '<span style="color:var(--orange); font-weight:700;">🔒 [个人私账 • 独立]</span>';
                 }
 
                 let displayDate = "";
@@ -458,7 +465,7 @@
                 listCont.innerHTML += `
                     <div class="expense-item-card">
                         <div style="display:flex; align-items:center;">
-                            <div class="expense-icon-box">
+                            <div class="expense-icon-box" style="${isIndividual ? 'background:#FFF3E0; color:var(--orange);' : ''}">
                                 <i class="${e.type==='shared'?'fas fa-shopping-basket':(e.type==='individual_cost'?'fas fa-user-lock':'fas fa-vault')}"></i>
                             </div>
                             <div>
@@ -468,9 +475,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="expense-item-price">
-                            <span style="${e.type==='individual_cost'?'color:#7F8C8D; text-decoration:line-through; font-size:1rem; opacity:0.8;':''}">${e.amount.toLocaleString()}</span> 
-                            <small style="font-size:0.65rem; font-weight:700; ${e.type==='individual_cost'?'color:#7F8C8D;':''}">JPY</small>
+                        <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
+                            <span>${e.amount.toLocaleString()}</span> 
+                            <small style="font-size:0.65rem; font-weight:700;">JPY</small>
                             <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
                         </div>
                     </div>`;
