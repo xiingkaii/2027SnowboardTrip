@@ -23,20 +23,50 @@
             min-height: 100vh; position: relative;
         }
 
-        /* Header - 随页面滚动 */
+        /* 🌟 Header 顶部布局与冰雪标题特效 */
         header { 
-            background: #fff; padding: 15px 25px; 
+            background: #fff; padding: 20px 25px 15px; 
             border-top: 15px solid var(--primary); box-shadow: 0 4px 20px rgba(196, 30, 58, 0.08); 
+            text-align: center; /* 确保整体居中 */
         }
-        h1 { margin: 0; font-size: 1.5rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; }
-        header p { margin: 0; color: #888; font-size: 0.9rem; font-weight: 500; }
+        
+        /* ❄️ 冰雪艺术字标题样式 */
+        h1 { 
+            margin: 0 auto; 
+            font-size: 1.6rem; 
+            font-weight: 900; 
+            text-align: center;
+            display: inline-block;
+            background: linear-gradient(180deg, #FFFFFF 0%, #E3F2FD 40%, #90CAF9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* 叠加多层雪花与冰晶质感的蓝色立体阴影 */
+            text-shadow: 0px 1px 0px #B0BEC5,
+                         0px 2px 0px #90A4AE,
+                         0px 3px 0px #78909C,
+                         0px 4px 5px rgba(144, 202, 249, 0.4),
+                         0px 4px 10px rgba(13, 71, 161, 0.15);
+            letter-spacing: -0.3px;
+            padding-bottom: 2px;
+        }
+        
+        /* 副标题完美居中 */
+        .header-sub-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        header p { margin: 0; color: #666; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.5px; }
+        .credit-tag { font-size: 0.65rem; color: #ccc !important; font-style: italic; font-weight: normal; }
         .banner-img { width: 100%; border-radius: 12px; margin-top: 15px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 🏨 酒店 Tab 专属样式（完美还原版） --- */
+        /* --- 🏨 酒店 Tab 专属样式 (绝对不动，完美保留) --- */
         .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); text-align: left; }
         .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
@@ -80,10 +110,10 @@
 <body>
 
     <header>
-        <h1 id="app-title">2027 Snowboard Trip</h1>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1 id="app-title">2027 日本滑雪之旅 JAPAN TRIP</h1>
+        <div class="header-sub-row">
             <p id="app-subtitle">加载中...</p>
-            <span style="font-size:0.6rem; color:#ddd; font-style:italic;">Created by XingKai</span>
+            <span class="credit-tag">Created by XingKai</span>
         </div>
         <img src="banner.png" alt="Snowboard Banner" class="banner-img">
     </header>
@@ -145,7 +175,7 @@
             el.classList.add('active');
         }
 
-        // --- 🏨 酒店逻辑 (精准匹配新表格) ---
+        // --- 🏨 酒店数据加载 (保持完美，未做任何改动) ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -153,7 +183,6 @@
                 if(!data) return;
                 cont.innerHTML = "";
                 
-                // 跳过标题行，从第二行开始读
                 data.slice(1).forEach(h => {
                     if(!h || !h[2] || h[2].trim() === "") return;
                     
@@ -190,15 +219,15 @@
             alert("✅ 地址已复制！");
         }
 
-        // --- 📅 行程逻辑 ---
+        // --- 📅 行程数据加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
                 const cont = document.getElementById('itinerary-container');
                 if(!data) return;
                 
-                if(data[0]) document.getElementById('app-title').innerText = data[0][1] || "2027 Snowboard Trip";
-                if(data[2]) document.getElementById('app-subtitle').innerText = data[2][1] || "";
+                // 动态获取副标题（如 5-APR >>> 13-APR）
+                if(data[2] && data[2][1]) document.getElementById('app-subtitle').innerText = data[2][1];
 
                 let daysMap = new Map();
                 data.slice(6).forEach((r) => {
