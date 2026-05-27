@@ -62,7 +62,7 @@
         .btn-ref-small { background: #FFEBEE; color: #C41E3A; border: 1px solid #FFCDD2; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: background 0.2s; }
 
         /* --- 🏨 酒店 Tab --- */
-        .hotel-card { background: white; border-radius: 16px; margin: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: left; }
+        .hotel-card { background: white; border-radius: 16px; margin: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: left; border: 1px solid rgba(0,0,0,0.01); }
         .hotel-tag { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
         .tag-hotel { background: #E3F2FD; color: #1565C0; }
@@ -85,11 +85,9 @@
         .pool-amount-display { font-size: 2.6rem; font-weight: 900; margin: 4px 0; letter-spacing: -1px; }
         
         .pool-members-box { background: rgba(0,0,0,0.15); border-radius: 14px; padding: 14px 16px; margin-top: 15px; text-align: left; }
-        
         .pool-member-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding: 9px 0; font-size: 0.9rem; font-weight: 700; }
         .pool-member-row:last-child { border-bottom: none; }
         
-        /* 🎨 像素头像和名字样式对齐 */
         .member-profile-wrapper { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .pixel-avatar { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; background: rgba(255,255,255,0.2); image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.4); }
         .fallback-avatar { width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: white; text-transform: uppercase; }
@@ -105,7 +103,6 @@
         }
         .form-input:focus { background: white; border-color: var(--primary); }
         
-        /* 动态成员勾选面板 */
         .involvement-grid-title { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 8px 0 10px; display: flex; align-items: center; gap: 4px; }
         .involvement-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #FFF5F6; padding: 12px; border-radius: 10px; border: 1px dashed #FFCDD2; margin-bottom: 15px; }
         .chk-btn-wrapper { display: flex; align-items: center; justify-content: center; }
@@ -214,20 +211,18 @@
         let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
         let expenses = JSON.parse(localStorage.getItem('snow_trip_pool_v3') || '[]');
 
-        // 🌟 核心配置：在这里映射 8 个人的 Pixel Art 头像链接 
-        // 建议图片使用 1:1 正方形、透明底的 PNG，放在和 index.html 同一个 GitHub 文件夹中。
+        // 🌟 完美修复：将文件名映射字典修改为和 GitHub 完全一致的“大写形式”
         const avatarMaps = {
-            "XK": "xk.png",
-            "YM": "ym.png",
-            "JY": "jy.png",
-            "JP": "jp.png",
-            "WS": "ws.png",
-            "Patric": "patric.png",
-            "CY": "cy.png",
-            "ZK": "zk.png"
+            "XK": "XK.png",
+            "YM": "YM.png",
+            "JY": "JY.png",
+            "JP": "JP.png",
+            "WS": "WS.png",
+            "Patric": "Patric.png",
+            "CY": "CY.png",
+            "ZK": "ZK.png"
         };
 
-        // 头像自带色彩背景，防止图片没有加载出来时作为优雅备用
         const avatarBgColors = {
             "XK": "#FF7675", "YM": "#FDCB6E", "JY": "#0984E3", "JP": "#00B894",
             "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
@@ -330,7 +325,7 @@
             }});
         }
 
-        // --- 💰 记账大金库逻辑 ---
+        // --- 💰 记账 Tab ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -484,14 +479,12 @@
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
-            // 💡 注入 Pixel Art 头像和优雅占位符的渲染底座
             let membersHtml = '';
             friends.forEach(f => {
                 let myBalance = memberDepositMap[f] - memberSpentMap[f];
                 let sign = myBalance >= 0 ? '+' : '';
                 let color = myBalance >= 0 ? '#00FF00' : '#FFAAAA';
                 
-                // 自动检查并渲染头像路径，如果没有就用首字母作为可爱的备用框
                 let avatarHtml = '';
                 if(avatarMaps[f]) {
                     avatarHtml = `<img src="${avatarMaps[f]}" class="pixel-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
