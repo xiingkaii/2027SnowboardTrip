@@ -12,120 +12,67 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        :root { --primary: #C41E3A; --bg: #F5F7FA; --dark-red: #BC002D; --dark-blue: #0D47A1; }
+        :root { --primary: #C41E3A; --bg: #F5F7FA; --dark-red: #BC002D; --dark-blue: #0D47A1; --remark-bg: #FFF0F2; }
         * { box-sizing: border-box; }
         
         body { 
-            /* 🌟 整体换上更轻快、开心、圆润的现代字体组合 */
             font-family: "Quicksand", "Comfortaa", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, sans-serif; 
-            background: var(--bg); margin: 0 auto; 
-            padding-bottom: 120px; 
+            background: var(--bg); margin: 0 auto; padding-bottom: 120px; 
             color: #333; -webkit-tap-highlight-color: transparent; width: 100%; max-width: 480px; 
             min-height: 100vh; position: relative;
         }
 
-        /* Header 布局 */
+        /* --- Header 布局 (已按要求优化：居中、暗蓝、单行) --- */
         header { 
             background: #fff; padding: 20px 20px 15px; 
             border-top: 15px solid var(--primary); box-shadow: 0 4px 20px rgba(196, 30, 58, 0.08); 
             text-align: center;
         }
-        
-        /* ❄️ 强制单行 + 暗蓝色立体冰晶字 + 开心圆润体 */
         h1 { 
-            margin: 0 auto; 
-            font-size: 1.35rem; 
-            font-weight: 900; 
-            text-align: center;
-            color: var(--dark-blue);
-            white-space: nowrap; 
-            letter-spacing: 0.5px; /* 稍微拉开一点字距，显得更轻松活泼 */
-            /* 专属暗蓝色立体透镜阴影 */
-            text-shadow: 0px 1px 0px #90CAF9,
-                         0px 2px 0px #64B5F6,
-                         0px 3px 0px #42A5F5,
-                         0px 3px 6px rgba(13, 71, 161, 0.3);
+            margin: 0 auto; font-size: 1.35rem; font-weight: 900; color: var(--dark-blue);
+            white-space: nowrap; letter-spacing: 0.5px;
+            text-shadow: 0px 1px 0px #90CAF9, 0px 2px 0px #64B5F6, 0px 3px 0px #42A5F5, 0px 3px 6px rgba(13, 71, 161, 0.3);
             padding-bottom: 4px;
         }
-        
-        /* 元数据行（日期框与作者签名） */
-        .header-meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding: 0 4px;
-        }
-        
-        /* 日期输入框 */
-        .date-input-container {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex: 1;
-        }
-        .date-editable {
-            border: none;
-            background: #F5F7FA;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            width: 160px;
-            outline: none;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            font-family: inherit;
-        }
-        .date-editable:focus {
-            background: #fff;
-            border-color: var(--primary);
-        }
-        
-        /* 极简淡雅版作者标签 */
-        .credit-tag { 
-            font-size: 0.65rem; 
-            color: rgba(0, 0, 0, 0.25) !important; 
-            font-weight: 400; 
-            letter-spacing: 0.1px;
-            text-align: right;
-            user-select: none;
-        }
-        
+        .header-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 0 4px; }
+        .date-editable { border: none; background: #F5F7FA; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary); width: 160px; outline: none; }
+        .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; }
         .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 🏨 酒店 Tab 专属样式 (不动它，完美保留) --- */
-        .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); text-align: left; }
+        /* --- 📅 行程 Tab 专属样式 (完全参考截图还原) --- */
+        .itinerary-card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .itinerary-header { display: flex; height: 75px; cursor: pointer; align-items: stretch; }
+        .itinerary-day-box { background: var(--dark-red); color: white; width: 75px; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0; }
+        .itinerary-day-box .day-label { font-size: 1.4rem; font-weight: 900; line-height: 1; }
+        .itinerary-day-box .date-label { font-size: 0.75rem; font-weight: 500; margin-top: 2px; }
+        .itinerary-title-box { flex: 1; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; }
+        .itinerary-title-box .main-title { font-size: 1.1rem; font-weight: 800; color: #222; }
+        .itinerary-title-box i { color: var(--primary); transition: 0.3s; }
+        .itinerary-card.open .itinerary-title-box i { transform: rotate(180deg); }
+
+        /* 时间轴列表 */
+        .itinerary-body { display: none; padding: 20px 15px; border-top: 1px solid #f5f5f5; }
+        .itinerary-card.open .itinerary-body { display: block; }
+        .timeline-item { position: relative; padding-left: 25px; border-left: 2px solid #FEE2E2; padding-bottom: 25px; margin-left: 8px; }
+        .timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -7px; top: 2px; width: 12px; height: 12px; background: white; border: 2.5px solid var(--primary); border-radius: 50%; }
+        .event-time { color: var(--primary); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px; }
+        .event-act { font-weight: 800; font-size: 1.05rem; color: #111; margin-bottom: 6px; }
+        .event-remark-box { background: var(--remark-bg); padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #444; line-height: 1.5; margin-bottom: 10px; border-left: 3px solid var(--primary); }
+        .btn-map-small { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+
+        /* --- 🏨 酒店 Tab 专属样式 (保持原样) --- */
+        .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: left; }
         .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
         .tag-hotel { background: #E3F2FD; color: #1565C0; }
-        .hotel-header-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
-        .hotel-icon-pin { color: #E91E63; font-size: 1rem; }
-        .hotel-title { font-size: 1.15rem; font-weight: 800; color: #333; line-height: 1.4; }
-        .hotel-date { font-size: 0.8rem; color: #999; margin-bottom: 15px; padding-left: 2px; }
         .hotel-address-box { background: #F9FAFB; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; color: #333; font-weight: 600; line-height: 1.6; }
-        .hotel-remark { font-size: 0.85rem; color: #666; font-weight: 400; margin-top: 6px; display: block; line-height: 1.5; }
-        .hotel-btns { display: flex; gap: 10px; }
-        .btn-nav { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 10px rgba(188, 0, 45, 0.2); }
+        .btn-nav { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-copy { flex: 1; background: #F0F0F0; color: #333; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-
-        /* --- 📅 行程 Tab 样式 --- */
-        .card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-header { display: flex; height: 80px; cursor: pointer; }
-        .header-left { background: #BC002D; color: white; width: 70px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .day-num { font-size: 1.5rem; font-weight: 900; }
-        .day-date { font-size: 0.75rem; }
-        .header-right { flex: 1; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
-        .day-title { font-size: 1.15rem; font-weight: 800; color: #222; }
-        .card-body { display: none; padding: 25px 20px; border-top: 1px solid #f5f5f5; }
-        .card.open .card-body { display: block; }
-        .timeline-item { position: relative; padding-left: 25px; border-left: 2px solid #eee; padding-bottom: 25px; margin-left: 10px; }
-        .timeline-dot { position: absolute; left: -7px; top: 4px; width: 10px; height: 10px; background: white; border: 3px solid #BC002D; border-radius: 50%; }
 
         /* --- 💰 记账 Tab 样式 --- */
         .expense-header { background: linear-gradient(135deg, #C41E3A, #8E0E25); color: white; padding: 25px; margin: 15px; border-radius: 16px; text-align: center; }
@@ -144,11 +91,10 @@
 
     <header>
         <h1>2027 日本滑雪之旅 JAPAN TRIP</h1>
-        
         <div class="header-meta-row">
             <div class="date-input-container">
                 <span style="font-size:0.85rem;">📅</span>
-                <input type="text" id="editable-date" class="date-editable" placeholder="点此输入日期..." oninput="saveTripDate(this.value)">
+                <input type="text" id="editable-date" class="date-editable" placeholder="输入日期..." oninput="saveTripDate(this.value)">
             </div>
             <div class="credit-tag">Created by XingKai</div>
         </div>
@@ -170,7 +116,7 @@
             <div id="settle-text" style="margin-top:10px; font-size:0.85rem; background:rgba(0,0,0,0.1); padding:10px; border-radius:10px;"></div>
         </div>
         <div class="input-card">
-            <select id="payer-input" class="form-input" style="color:var(--primary);"></select>
+            <select id="payer-input" class="form-input"></select>
             <select id="type-input" class="form-input">
                 <option value="shared">👨‍👩‍👧‍👦 共享AA</option>
                 <option value="personal">👤 个人私账</option>
@@ -196,8 +142,7 @@
         };
 
         let friends = ["朋友A", "朋友B", "朋友C", "朋友D", "朋友E", "朋友F", "朋友G", "朋友H"];
-        let config = { rate: 0.026 };
-        let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v4') || '[]');
+        let expenses = JSON.parse(localStorage.getItem('snow_trip_2027_v5') || '[]');
 
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
@@ -206,9 +151,7 @@
             setTimeout(loadHotels, 400);
         };
 
-        function saveTripDate(val) {
-            localStorage.setItem('snow_trip_custom_date', val);
-        }
+        function saveTripDate(val) { localStorage.setItem('snow_trip_custom_date', val); }
 
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -218,30 +161,84 @@
             if(id === 'itinerary') loadItinerary();
         }
 
+        // --- 📅 行程核心逻辑 (参考截图完美对齐) ---
+        function loadItinerary() {
+            Papa.parse(urls.itinerary, { download: true, complete: (res) => {
+                const data = res.data;
+                const cont = document.getElementById('itinerary-container');
+                if(!data) return;
+
+                let daysMap = new Map();
+                // 跳过标题行，从第 7 行开始抓取数据 (index 6)
+                data.slice(6).forEach((r) => {
+                    if(!r || !r[0] || r[0].trim() === "") return;
+                    const dayKey = r[0].trim(); // A列: D0, D1...
+                    
+                    if(!daysMap.has(dayKey)) {
+                        daysMap.set(dayKey, { 
+                            dayNum: dayKey, 
+                            dateLabel: r[1] || '', // B列: 日期
+                            mainTitle: r[3] || '', // D列: 地点总结
+                            events: [] 
+                        });
+                    }
+                    if(r[4]) { // E列: Activity
+                        daysMap.get(dayKey).events.push({
+                            time: r[2] || '', // C列: Time
+                            act: r[4] || '',  // E列: Activity
+                            rem: r[5] || '',  // F列: Remarks
+                            map: r[6] || ''   // G列: Map Link
+                        });
+                    }
+                });
+
+                cont.innerHTML = "";
+                daysMap.forEach((v) => {
+                    let eventsHtml = v.events.map(e => `
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <span class="event-time">${e.time}</span>
+                            <div class="event-act">${e.act}</div>
+                            ${e.rem ? `<div class="event-remark-box">${e.rem.replace(/\n/g, '<br>')}</div>` : ''}
+                            ${e.map && e.map.startsWith('http') ? `<a href="${e.map}" target="_blank" class="btn-map-small"><i class="fas fa-route"></i> 路线</a>` : ''}
+                        </div>`).join('');
+
+                    cont.innerHTML += `
+                        <div class="itinerary-card">
+                            <div class="itinerary-header" onclick="this.parentElement.classList.toggle('open')">
+                                <div class="itinerary-day-box">
+                                    <span class="day-label">${v.dayNum}</span>
+                                    <span class="date-label">${v.dateLabel}</span>
+                                </div>
+                                <div class="itinerary-title-box">
+                                    <span class="main-title">${v.mainTitle}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="itinerary-body">${eventsHtml}</div>
+                        </div>`;
+                });
+            }});
+        }
+
+        // --- 🏨 酒店逻辑 (保持原样) ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
                 const cont = document.getElementById('hotel-container');
-                if(!data) return;
                 cont.innerHTML = "";
-                
                 data.slice(1).forEach(h => {
-                    if(!h || !h[2] || h[2].trim() === "") return;
+                    if(!h || !h[2]) return;
                     const tag = h[4] || '住宿';
                     const isAirbnb = tag.toLowerCase().includes('airbnb');
-                    const tagClass = isAirbnb ? 'tag-airbnb' : 'tag-hotel';
-                    const addr = h[3] || '暂无地址';
-                    const remark = h[5] ? `<span class="hotel-remark">${h[5].replace(/\n/g, '<br>')}</span>` : '';
-                    const mapLink = h[6] || '';
                     cont.innerHTML += `
                         <div class="hotel-card">
-                            <span class="hotel-tag ${tagClass}">${tag}</span>
-                            <div class="hotel-header-row"><i class="fas fa-map-marker-alt hotel-icon-pin"></i><div class="hotel-title">${h[1] || ''}：${h[2]}</div></div>
-                            <div class="hotel-date">${h[0] || ''}</div>
-                            <div class="hotel-address-box"><div>${addr}</div>${remark}</div>
-                            <div class="hotel-btns">
-                                ${mapLink ? `<a href="${mapLink}" target="_blank" class="btn-nav"><i class="fas fa-location-arrow"></i> 导航前往</a>` : '<button class="btn-nav" disabled>暂无位置</button>'}
-                                <button class="btn-copy" onclick="copyAddress('${addr.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> 复制地址</button>
+                            <span class="hotel-tag ${isAirbnb?'tag-airbnb':'tag-hotel'}">${tag}</span>
+                            <div style="font-weight:800; font-size:1.1rem; margin-bottom:10px;">${h[1]}：${h[2]}</div>
+                            <div class="hotel-address-box">${h[3]}</div>
+                            <div style="display:flex; gap:10px;">
+                                <a href="${h[6]}" target="_blank" class="btn-nav"><i class="fas fa-location-arrow"></i> 导航前往</a>
+                                <button class="btn-copy" onclick="copyAddress('${h[3]}')"><i class="fas fa-copy"></i> 复制</button>
                             </div>
                         </div>`;
                 });
@@ -249,49 +246,15 @@
             }});
         }
 
-        function copyAddress(text) {
-            const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+        function copyAddress(t) {
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             alert("✅ 地址已复制！");
-        }
-
-        function loadItinerary() {
-            Papa.parse(urls.itinerary, { download: true, complete: (res) => {
-                const data = res.data;
-                const cont = document.getElementById('itinerary-container');
-                if(!data) return;
-                let daysMap = new Map();
-                data.slice(6).forEach((r) => {
-                    if(!r || !r[1] || r[1].trim() === "") return;
-                    const dayKey = r[1].trim();
-                    if(!daysMap.has(dayKey)) daysMap.set(dayKey, { date: r[2], title: r[4], events: [] });
-                    if(r[3] || r[5]) daysMap.get(dayKey).events.push({ time: r[3], act: r[5] || r[4], rem: r[6] });
-                });
-                cont.innerHTML = "";
-                daysMap.forEach((v, k) => {
-                    let evsHtml = v.events.map(e => `
-                        <div class="timeline-item">
-                            <div class="timeline-dot"></div>
-                            <span class="event-time">${e.time || '全天'}</span>
-                            <div class="event-act">${e.act}</div>
-                        </div>`).join('');
-                    cont.innerHTML += `
-                        <div class="card">
-                            <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
-                                <div class="header-left"><div class="day-num">${k}</div><div class="day-date">${v.date}</div></div>
-                                <div class="header-right"><div class="day-title">${v.title}</div><i class="fas fa-chevron-down"></i></div>
-                            </div>
-                            <div class="card-body">${evsHtml}</div>
-                        </div>`;
-                });
-            }});
         }
 
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
-                if(res.data.length > 1) {
-                    friends = res.data.slice(1).map(r => r[3]).filter(n => n);
-                    document.getElementById('payer-input').innerHTML = friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
-                }
+                if(res.data.length > 1) friends = res.data.slice(1).map(r => r[3]).filter(n => n);
+                document.getElementById('payer-input').innerHTML = friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
                 renderExpenses();
             }});
         }
@@ -299,9 +262,8 @@
         function addExpense() {
             const amt = parseFloat(document.getElementById('amt-input').value);
             if(!amt) return alert("请输入金额");
-            const newEx = { id: Date.now(), amount: amt, note: document.getElementById('note-input').value, payer: document.getElementById('payer-input').value, type: document.getElementById('type-input').value };
-            expenses.unshift(newEx);
-            localStorage.setItem('snow_trip_2027_v4', JSON.stringify(expenses));
+            expenses.unshift({ id: Date.now(), amount: amt, note: document.getElementById('note-input').value, payer: document.getElementById('payer-input').value, type: document.getElementById('type-input').value });
+            localStorage.setItem('snow_trip_2027_v5', JSON.stringify(expenses));
             renderExpenses();
         }
 
@@ -311,16 +273,11 @@
             expenses.forEach(e => { if(e.type==='shared') { total += e.amount; paidMap[e.payer] += e.amount; }});
             document.getElementById('display-total').innerText = total.toLocaleString() + ' JPY';
             const avg = total / friends.length;
-            let html = friends.map(f => {
+            document.getElementById('settle-text').innerHTML = friends.map(f => {
                 const bal = paidMap[f] - avg;
                 return `<div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:2px 0;"><span>${f}</span><strong>${bal>=0?'+':''}${Math.round(bal).toLocaleString()}</strong></div>`;
             }).join('');
-            document.getElementById('settle-text').innerHTML = html;
-            document.getElementById('expense-list').innerHTML = expenses.map(e => `
-                <div class="item-card">
-                    <div><strong>${e.note}</strong><br><small>${e.payer} • ${e.type}</small></div>
-                    <div style="text-align:right"><strong>${e.amount.toLocaleString()} JPY</strong></div>
-                </div>`).join('');
+            document.getElementById('expense-list').innerHTML = expenses.map(e => `<div class="input-card" style="margin-bottom:10px;"><strong>${e.note}</strong><br><small>${e.payer} • ${e.amount.toLocaleString()} JPY</small></div>`).join('');
         }
     </script>
 </body>
