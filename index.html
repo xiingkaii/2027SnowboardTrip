@@ -113,6 +113,10 @@
         .btn-add { width: 100%; background: #1A1A1A; color: white; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-add:disabled { background: #888; cursor: not-allowed; }
 
+        /* 🌟 日期分组大标题样式 */
+        .expense-group-title { font-size: 0.95rem; font-weight: 900; color: var(--dark-blue); margin: 20px 18px 10px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
+        .expense-group-title::before { content: ""; display: inline-block; width: 4px; height: 14px; background: var(--primary); border-radius: 2px; }
+
         .expense-item-card { 
             background: white; margin: 0 15px 12px; padding: 15px 18px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.01); 
         }
@@ -121,7 +125,6 @@
         .expense-item-price { font-size: 1.15rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 4px; }
         .expense-item-price.personal-cost-style { color: var(--orange) !important; }
 
-        /* 云端与本地的小标记 */
         .sync-badge { font-size: 0.6rem; padding: 1px 4px; border-radius: 3px; font-weight: 800; margin-left: 4px; vertical-align: middle; }
         .badge-cloud { background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB; }
         .badge-local { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
@@ -172,7 +175,7 @@
         </div>
 
         <div class="input-card">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式：公账自动云同步，个人私账仅留存本手机加密。</div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式说明：个人开销记录将完全独立，绝不影响公款池余额</div>
             <div class="form-row">
                 <select id="payer-input" class="form-input" style="color:var(--primary); background:#FFF0F2; border:1px solid #FFCDD2;" onchange="handlePayerChange(this.value)"></select>
                 <select id="type-input" class="form-input" onchange="toggleInvolvementSection(this.value)">
@@ -224,7 +227,6 @@
     </div>
 
     <script>
-        // 🚀 完美的云端中转服务器端点 
         const CLOUD_API = 'https://script.google.com/macros/s/AKfycbxSL5ZmHK7Ua72_q6bWpiBMglignWhyh7r2MofhbUrzK8nyzMbccjt4K7i7WfkqB3tL/exec';
 
         const urls = {
@@ -234,10 +236,8 @@
         };
 
         let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
-        
-        // 核心拆分两路：
-        let cloudExpenses = []; // 来自云端 Google Sheet (共享AA 和 个人充值)
-        let localExpenses = JSON.parse(localStorage.getItem('snow_trip_private_local_v1') || '[]'); // 仅本手机绝对私密的账目
+        let cloudExpenses = []; 
+        let localExpenses = JSON.parse(localStorage.getItem('snow_trip_private_local_v1') || '[]'); 
 
         const avatarMaps = {
             "XK": "XK.png", "YM": "YM.png", "JY": "JY.png", "JP": "JP.png",
@@ -263,6 +263,7 @@
 
         function saveTripDate(val) { localStorage.setItem('snow_trip_custom_date', val); }
 
+        // 切换 Tab 时顺便重算/拉取对应数据
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
@@ -367,7 +368,7 @@
             }});
         }
 
-        // --- 💰 记账 Tab ---
+        // --- 💰 记账 Tab 基础同步配置 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -411,7 +412,8 @@
                     renderExpenses();
                 })
                 .catch(err => {
-                    console.error("读取云端数据失败，转为离线模式", err);
+                    console.error("加载云端同步失败，切换至混合视图", err);
+                    renderExpenses();
                 })
                 .finally(() => {
                     if(icon) icon.classList.remove('spinning');
@@ -450,9 +452,7 @@
                 involved: involvedMembers
             };
 
-            // 🌟 核心智能分流路由核心逻辑！
             if (type === 'individual_cost') {
-                // A. 个人私账：不上云，悄悄进手机缓存
                 localExpenses.unshift(newTx);
                 localStorage.setItem('snow_trip_private_local_v1', JSON.stringify(localExpenses));
                 document.getElementById('amt-input').value = '';
@@ -460,14 +460,14 @@
                 renderExpenses();
                 alert("🔒 个人私账已保密存入本机！");
             } else {
-                // B. 公账（分摊或充值）：立刻上报云端 Google Sheet
                 const btn = document.getElementById('submit-btn');
                 btn.disabled = true;
                 btn.innerText = "⚡ 正在同步到云端...";
 
+                // 优化：标准表单编码发送，确保谷歌 Script 跨域100%安全写入
                 fetch(CLOUD_API, {
                     method: 'POST',
-                    mode: 'no-cors', // 解决跨域限制写入
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newTx)
                 })
@@ -475,7 +475,6 @@
                     document.getElementById('amt-input').value = '';
                     document.getElementById('note-input').value = '';
                     alert("🚀 公账云端同步成功！全员已可见。");
-                    // 稍等一秒让谷歌服务器反应，然后重新拉取最新列表
                     setTimeout(fetchCloudExpenses, 1000);
                 })
                 .catch(err => {
@@ -496,11 +495,12 @@
                     localStorage.setItem('snow_trip_private_local_v1', JSON.stringify(localExpenses));
                     renderExpenses();
                 } else {
-                    alert("💡 云端同步的公账无法直接在手机删除，请通知管理员 XK 在 Google Sheet 试算表内直接删改。");
+                    alert("💡 云端同步的公账无法直接在手机删除，请通知 XK 在 Google Sheet 试算表内直接删改。");
                 }
             }
         }
 
+        // 🌟 核心升级：分组且倒序排列的渲染逻辑
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
@@ -512,24 +512,26 @@
             if(!listCont) return;
             listCont.innerHTML = '';
 
-            // 🌟 强行将公账与私账混合起来，并按时间线排序
+            // 合并公私账目
             let combinedExpenses = [];
             cloudExpenses.forEach(e => { e.isCloud = true; combinedExpenses.push(e); });
             localExpenses.forEach(e => { e.isCloud = false; combinedExpenses.push(e); });
 
+            // 严格的智能倒序排序：优先比对日期，再比对精确时间戳
             combinedExpenses.sort((a, b) => {
-                if (a.date !== b.date) return new Date(b.date) - new Date(a.date);
+                const dKeyA = typeof a.date === 'string' ? a.date.split('T')[0] : '';
+                const dKeyB = typeof b.date === 'string' ? b.date.split('T')[0] : '';
+                if (dKeyA !== dKeyB) return new Date(dKeyB) - new Date(dKeyA);
                 return b.id - a.id; 
             });
 
+            // 🌟 核心改动：利用数据桶将账目按日期分组
+            let groupedMap = new Map();
+
             combinedExpenses.forEach(e => {
-                let badgeText = '';
-                let isIndividual = false;
-                
                 if (e.type === 'personal') {
                     initialPoolTotal += e.amount;
                     if(memberDepositMap[e.payer] !== undefined) memberDepositMap[e.payer] += e.amount;
-                    badgeText = '<span style="color:#2E7D32; font-weight:700;">[大池注入]</span>';
                 } else if (e.type === 'shared') {
                     totalSpentFromPool += e.amount;
                     const poolInvolvedList = e.involved || friends; 
@@ -537,43 +539,67 @@
                     poolInvolvedList.forEach(m => {
                         if(memberSpentMap[m] !== undefined) memberSpentMap[m] += perHeadCost;
                     });
-                    badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${poolInvolvedList.length}人]</span>`;
-                } else if (e.type === 'individual_cost') {
-                    isIndividual = true;
-                    badgeText = '<span style="color:var(--orange); font-weight:700;">[个人私账 • 独立]</span>';
                 }
 
-                let displayDate = "";
+                // 提取优化的日期大标签：形如 "5月27日"
+                let dateGroupKey = "未指定日期";
                 if(e.date) {
-                    // 处理谷歌返回的日期对象格式或者字符串格式
-                    const dStr = typeof e.date === 'string' ? e.date : e.date.split('T')[0];
+                    const dStr = typeof e.date === 'string' ? e.date.split('T')[0] : '';
                     const dParts = dStr.split('-');
-                    if(dParts.length === 3) displayDate = `${parseInt(dParts[1])}月${parseInt(dParts[2])}日 `;
+                    if(dParts.length === 3) {
+                        dateGroupKey = `${parseInt(dParts[1])}月${parseInt(dParts[2])}日`;
+                    }
                 }
 
-                const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">云公账</span>` : `<span class="sync-badge badge-local">私密本端</span>`;
-
-                listCont.innerHTML += `
-                    <div class="expense-item-card">
-                        <div style="display:flex; align-items:center;">
-                            <div class="expense-icon-box" style="${isIndividual ? 'background:#FFF3E0; color:var(--orange);' : ''}">
-                                <i class="${e.type==='shared'?'fas fa-shopping-basket':(e.type==='individual_cost'?'fas fa-user-lock':'fas fa-vault')}"></i>
-                            </div>
-                            <div>
-                                <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note} ${syncTag}</div>
-                                <div style="font-size:0.75rem; color:#888; margin-top:2px;">
-                                    <span style="color:#3498DB; font-weight:bold;">${displayDate}</span>经手: <strong>${e.payer}</strong> • ${badgeText}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
-                            <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
-                            <button class="btn-del" onclick="deleteEx(${e.id}, ${!e.isCloud})">×</button>
-                        </div>
-                    </div>`;
+                if(!groupedMap.has(dateGroupKey)) {
+                    groupedMap.set(dateGroupKey, []);
+                }
+                groupedMap.get(dateGroupKey).push(e);
             });
 
-            // 完美的阿公大池子资产实时变动计算
+            // 🌟 按日期顺序依次渲染出带有大标签的内容块
+            groupedMap.forEach((txList, dateTitle) => {
+                // 1. 先打上红格子位置对应的日期大分类标题
+                listCont.innerHTML += `<div class="expense-group-title">${dateTitle}</div>`;
+                
+                // 2. 依次塞入这一天的每一笔消费卡片
+                txList.forEach(e => {
+                    let badgeText = '';
+                    let isIndividual = false;
+                    
+                    if (e.type === 'personal') {
+                        badgeText = '<span style="color:#2E7D32; font-weight:700;">[大池注入]</span>';
+                    } else if (e.type === 'shared') {
+                        badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${e.involved ? e.involved.length : 8}人]</span>`;
+                    } else if (e.type === 'individual_cost') {
+                        isIndividual = true;
+                        badgeText = '<span style="color:var(--orange); font-weight:700;">[个人私账 • 独立]</span>';
+                    }
+
+                    const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">云端</span>` : `<span class="sync-badge badge-local">私密</span>`;
+
+                    listCont.innerHTML += `
+                        <div class="expense-item-card">
+                            <div style="display:flex; align-items:center;">
+                                <div class="expense-icon-box" style="${isIndividual ? 'background:#FFF3E0; color:var(--orange);' : ''}">
+                                    <i class="${e.type==='shared'?'fas fa-shopping-basket':(e.type==='individual_cost'?'fas fa-user-lock':'fas fa-vault')}"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note} ${syncTag}</div>
+                                    <div style="font-size:0.75rem; color:#888; margin-top:2px;">
+                                        经手人: <strong>${e.payer}</strong> • ${badgeText}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
+                                <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
+                                <button class="btn-del" onclick="deleteEx(${e.id}, ${!e.isCloud})">×</button>
+                            </div>
+                        </div>`;
+                });
+            });
+
+            // 阿公大池子计算
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
