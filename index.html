@@ -198,8 +198,6 @@
         <div id="expense-list"></div>
     </div>
 
-    <div style="display:none;"><input type="checkbox" id="user-chk-dummy"></div>
-
     <script>
         const urls = {
             itinerary: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1691826831&single=true&output=csv',
@@ -220,6 +218,7 @@
             "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
         };
 
+        // 🌟 修复核心：一上屏就必须全功能强行并发渲染，决不允许任何延迟漏掉！
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
             document.getElementById('editable-date').value = savedDate;
@@ -227,8 +226,10 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('expense-date-input').value = today;
 
-            loadSettings();
-            setTimeout(loadHotels, 400);
+            // 强行把所有网络解析和渲染一口气全部启动！
+            loadSettings(); 
+            loadHotels();
+            loadItinerary();
         };
 
         function saveTripDate(val) { localStorage.setItem('snow_trip_custom_date', val); }
@@ -238,39 +239,38 @@
             document.getElementById('tab-' + id).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
+            
+            // 🌟 修复核心：切Tab的一瞬间必须当场重算，防白屏机制
             if(id === 'itinerary') loadItinerary();
+            if(id === 'hotel') loadHotels();
+            if(id === 'expense') renderExpenses();
         }
 
         function toggleInvolvementSection(type) {
             document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none';
         }
 
-        // 🌟 自动化工作流函数
         function handleAmountKeyDown(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                document.getElementById('amt-input').blur(); // 触发失焦，进而调用 jumpToCategory()
+                document.getElementById('amt-input').blur();
             }
         }
 
         function jumpToCategory() {
             const amt = document.getElementById('amt-input').value;
             if (amt && amt.trim() !== "") {
-                // 打开下拉框聚焦
-                const catInput = document.getElementById('cat-input');
-                catInput.focus();
+                document.getElementById('cat-input').focus();
             }
         }
 
         function jumpToNote() {
-            // 选定种类之后直接秒进备注框输入
             setTimeout(() => {
-                const noteInput = document.getElementById('note-input');
-                noteInput.focus();
+                document.getElementById('note-input').focus();
             }, 50);
         }
 
-        // --- 🏨 酒店 Tab ---
+        // --- 🏨 酒店 Tab 加载 ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -295,7 +295,6 @@
                             </div>
                         </div>`;
                 });
-                loadItinerary();
             }});
         }
 
@@ -304,7 +303,7 @@
             alert("✅ 地址已复制！");
         }
 
-        // --- 📅 行程 Tab ---
+        // --- 📅 行程 Tab 加载 ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -342,7 +341,7 @@
             }});
         }
 
-        // --- 💰 记账 Tab ---
+        // --- 💰 记账 Tab 设置与同步 ---
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -354,8 +353,7 @@
                     if(list.length > 0) friends = list;
                 }
                 
-                const payerSelect = document.getElementById('payer-input');
-                payerSelect.innerHTML = `<option value="阿公钱">💰 阿公钱 Pool</option>` + friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
+                document.getElementById('payer-input').innerHTML = `<option value="阿公钱">💰 阿公钱 Pool</option>` + friends.map(f => `<option value="${f}">👤 ${f}</option>`).join('');
                 
                 const gridCont = document.getElementById('checkbox-grid-container');
                 gridCont.innerHTML = friends.map(f => `
@@ -367,14 +365,7 @@
                 if (expenses.length === 0) {
                     friends.forEach(f => {
                         expenses.push({
-                            id: Date.now() + Math.random(),
-                            amount: 10000,
-                            note: "初始入股预交公款",
-                            payer: f,
-                            type: "personal",
-                            cat: "Others",
-                            date: new Date().toISOString().split('T')[0],
-                            involved: [f]
+                            id: Date.now() + Math.random(), amount: 10000, note: "初始入股预交公款", payer: f, type: "personal", cat: "Others", date: new Date().toISOString().split('T')[0], involved: [f]
                         });
                     });
                     localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
@@ -412,14 +403,7 @@
             }
             
             expenses.unshift({
-                id: Date.now(),
-                amount: amt,
-                note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')),
-                payer: payer,
-                type: type,
-                cat: cat,
-                date: dateVal,
-                involved: involvedMembers
+                id: Date.now(), amount: amt, note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')), payer: payer, type: type, cat: cat, date: dateVal, involved: involvedMembers
             });
             
             localStorage.setItem('snow_trip_pool_v3', JSON.stringify(expenses));
@@ -436,17 +420,15 @@
             }
         }
 
-        document.getElementById('user-chk-dummy').checked = true;
-
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
-            
             let memberDepositMap = {}; 
             let memberSpentMap = {};   
             friends.forEach(f => { memberDepositMap[f] = 0; memberSpentMap[f] = 0; });
 
             const listCont = document.getElementById('expense-list');
+            if(!listCont) return;
             listCont.innerHTML = '';
 
             expenses.sort((a, b) => {
@@ -457,7 +439,6 @@
             expenses.forEach(e => {
                 let badgeText = '';
                 let isIndividual = false;
-                
                 if (e.type === 'personal') {
                     initialPoolTotal += e.amount;
                     if(memberDepositMap[e.payer] !== undefined) memberDepositMap[e.payer] += e.amount;
@@ -495,8 +476,7 @@
                             </div>
                         </div>
                         <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
-                            <span>${e.amount.toLocaleString()}</span> 
-                            <small style="font-size:0.65rem; font-weight:700;">JPY</small>
+                            <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
                             <button class="btn-del" onclick="deleteEx(${e.id})">×</button>
                         </div>
                     </div>`;
@@ -510,21 +490,12 @@
                 let myBalance = memberDepositMap[f] - memberSpentMap[f];
                 let sign = myBalance >= 0 ? '+' : '';
                 let color = myBalance >= 0 ? '#00FF00' : '#FFAAAA';
-                
-                let avatarHtml = '';
-                if(avatarMaps[f]) {
-                    avatarHtml = `<img src="${avatarMaps[f]}" class="pixel-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
-                }
+                let avatarHtml = avatarMaps[f] ? `<img src="${avatarMaps[f]}" class="pixel-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : '';
                 let fallbackHtml = `<div class="fallback-avatar" style="background:${avatarBgColors[f] || '#BC002D'}; display:${avatarMaps[f]?'none':'flex'};">${f.charAt(0)}</div>`;
                 
                 membersHtml += `
                     <div class="pool-member-row">
-                        <div class="member-profile-wrapper">
-                            ${avatarHtml}
-                            ${fallbackHtml}
-                            <div class="status-dot" style="background:${myBalance >= 0 ? '#00FF00' : '#BC002D'};"></div>
-                            <strong>${f}</strong>
-                        </div>
+                        <div class="member-profile-wrapper">${avatarHtml}${fallbackHtml}<div class="status-dot" style="background:${myBalance >= 0 ? '#00FF00' : '#BC002D'};"></div><strong>${f}</strong></div>
                         <div class="member-money-details">
                             <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto; padding-right:25px;">交了 ${memberDepositMap[f].toLocaleString()}</span>
                             <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">(余 ${sign}${Math.round(myBalance).toLocaleString()})</span>
