@@ -117,7 +117,6 @@
         }
         .expense-icon-box { width: 40px; height: 40px; border-radius: 10px; background: #FFF0F2; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 12px; }
         
-        /* 💸 核心设计修改：共享消费用红字，独立个人私账用充满活力的橙色，且绝不被割 */
         .expense-item-price { font-size: 1.15rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 4px; }
         .expense-item-price.personal-cost-style { color: var(--orange) !important; }
 
@@ -180,10 +179,10 @@
 
             <div class="form-row">
                 <input type="date" id="expense-date-input" class="form-input" style="flex:1;">
-                <input type="number" id="amt-input" class="form-input" placeholder="金额 (JPY)" style="flex:1.2;">
+                <input type="text" id="amt-input" class="form-input" placeholder="金额 (JPY)" inputmode="decimal" style="flex:1.2;" onkeydown="handleAmountKeyDown(event)" onblur="jumpToCategory()">
             </div>
             <div class="form-row">
-                <select id="cat-input" class="form-input">
+                <select id="cat-input" class="form-input" onchange="jumpToNote()">
                     <option value="Food">🍔 餐饮</option>
                     <option value="Transport">🚄 交通</option>
                     <option value="Ticket">🎫 雪票/门票</option>
@@ -199,11 +198,7 @@
         <div id="expense-list"></div>
     </div>
 
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('itinerary', this)"><span>📅</span>行程</div>
-        <div class="tab-item" onclick="switchTab('hotel', this)"><span>🏨</span>酒店</div>
-        <div class="tab-item" onclick="switchTab('expense', this)"><span>💰</span>记账</div>
-    </nav>
+    <div style="display:none;"><input type="checkbox" id="user-chk-dummy"></div>
 
     <script>
         const urls = {
@@ -248,6 +243,31 @@
 
         function toggleInvolvementSection(type) {
             document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none';
+        }
+
+        // 🌟 自动化工作流函数
+        function handleAmountKeyDown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('amt-input').blur(); // 触发失焦，进而调用 jumpToCategory()
+            }
+        }
+
+        function jumpToCategory() {
+            const amt = document.getElementById('amt-input').value;
+            if (amt && amt.trim() !== "") {
+                // 打开下拉框聚焦
+                const catInput = document.getElementById('cat-input');
+                catInput.focus();
+            }
+        }
+
+        function jumpToNote() {
+            // 选定种类之后直接秒进备注框输入
+            setTimeout(() => {
+                const noteInput = document.getElementById('note-input');
+                noteInput.focus();
+            }, 50);
         }
 
         // --- 🏨 酒店 Tab ---
@@ -371,7 +391,7 @@
         }
 
         function addExpense() {
-            const amt = parseFloat(document.getElementById('amt-input').value);
+            const amt = parseFloat(document.getElementById('amt-input').value.replace(/,/g, ''));
             const note = document.getElementById('note-input').value;
             const payer = document.getElementById('payer-input').value;
             const type = document.getElementById('type-input').value;
@@ -416,6 +436,8 @@
             }
         }
 
+        document.getElementById('user-chk-dummy').checked = true;
+
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
@@ -427,11 +449,8 @@
             const listCont = document.getElementById('expense-list');
             listCont.innerHTML = '';
 
-            // 🌟 核心修复 1：智能双重倒序排序引擎（优先消费日期从新到旧，同天内按创建时间戳从新到旧）
             expenses.sort((a, b) => {
-                if (a.date !== b.date) {
-                    return new Date(b.date) - new Date(a.date);
-                }
+                if (a.date !== b.date) return new Date(b.date) - new Date(a.date);
                 return b.id - a.id; 
             });
 
