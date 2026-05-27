@@ -22,7 +22,7 @@
             min-height: 100vh; position: relative;
         }
 
-        /* --- Header 布局 (已按要求优化：居中、暗蓝、单行) --- */
+        /* --- Header 布局 --- */
         header { 
             background: #fff; padding: 20px 20px 15px; 
             border-top: 15px solid var(--primary); box-shadow: 0 4px 20px rgba(196, 30, 58, 0.08); 
@@ -34,16 +34,43 @@
             text-shadow: 0px 1px 0px #90CAF9, 0px 2px 0px #64B5F6, 0px 3px 0px #42A5F5, 0px 3px 6px rgba(13, 71, 161, 0.3);
             padding-bottom: 4px;
         }
-        .header-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 0 4px; }
-        .date-editable { border: none; background: #F5F7FA; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary); width: 160px; outline: none; }
-        .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; }
+        
+        /* 元数据行：增加支持容纳快捷链接的布局 */
+        .header-meta-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-top: 12px; 
+            padding: 0 2px;
+            gap: 6px;
+        }
+        .date-input-container { display: flex; align-items: center; gap: 4px; }
+        .date-editable { border: none; background: #F5F7FA; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; color: var(--primary); width: 145px; outline: none; }
+        
+        /* 🌟 新增的 Google Sheet 快速访问快捷标签样式 */
+        .sheet-ref-link {
+            font-size: 0.7rem;
+            color: #2e7d32;
+            background: #e8f5e9;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            transition: background 0.2s;
+        }
+        .sheet-ref-link:active { background: #c8e6c9; }
+
+        .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; white-space: nowrap; }
         .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 📅 行程 Tab 专属样式 (完全参考截图还原) --- */
+        /* --- 📅 行程 Tab 专属样式 --- */
         .itinerary-card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .itinerary-header { display: flex; height: 75px; cursor: pointer; align-items: stretch; }
         .itinerary-day-box { background: var(--dark-red); color: white; width: 75px; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0; }
@@ -54,7 +81,6 @@
         .itinerary-title-box i { color: var(--primary); transition: 0.3s; }
         .itinerary-card.open .itinerary-title-box i { transform: rotate(180deg); }
 
-        /* 时间轴列表 */
         .itinerary-body { display: none; padding: 20px 15px; border-top: 1px solid #f5f5f5; }
         .itinerary-card.open .itinerary-body { display: block; }
         .timeline-item { position: relative; padding-left: 25px; border-left: 2px solid #FEE2E2; padding-bottom: 25px; margin-left: 8px; }
@@ -65,7 +91,7 @@
         .event-remark-box { background: var(--remark-bg); padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #444; line-height: 1.5; margin-bottom: 10px; border-left: 3px solid var(--primary); }
         .btn-map-small { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
 
-        /* --- 🏨 酒店 Tab 专属样式 (保持原样) --- */
+        /* --- 🏨 酒店 Tab 专属样式 --- */
         .hotel-card { background: white; border-radius: 12px; margin: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: left; }
         .hotel-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
@@ -80,6 +106,9 @@
         .input-card { background: white; margin: 0 15px 20px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .form-input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; font-size: 1rem; font-weight: 600; }
         .btn-submit { width: 100%; background: #1a1a1a; color: white; padding: 14px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; }
+        
+        /* 优化后的历史账单卡片视觉 */
+        .expense-item-card { background: white; margin: 0 15px 10px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.02); }
 
         /* 底栏 Tab Bar */
         .tab-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: white; border-radius: 50px; display: flex; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; }
@@ -93,9 +122,14 @@
         <h1>2027 日本滑雪之旅 JAPAN TRIP</h1>
         <div class="header-meta-row">
             <div class="date-input-container">
-                <span style="font-size:0.85rem;">📅</span>
+                <span style="font-size:0.8rem;">📅</span>
                 <input type="text" id="editable-date" class="date-editable" placeholder="输入日期..." oninput="saveTripDate(this.value)">
             </div>
+            
+            <a href="https://docs.google.com/spreadsheets/d/1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/edit" target="_blank" class="sheet-ref-link">
+                <i class="fas fa-table"></i> 原始表格
+            </a>
+
             <div class="credit-tag">Created by XingKai</div>
         </div>
         <img src="banner.png" alt="Snowboard Banner" class="banner-img">
@@ -161,7 +195,6 @@
             if(id === 'itinerary') loadItinerary();
         }
 
-        // --- 📅 行程核心逻辑 (参考截图完美对齐) ---
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -169,26 +202,15 @@
                 if(!data) return;
 
                 let daysMap = new Map();
-                // 跳过标题行，从第 7 行开始抓取数据 (index 6)
                 data.slice(6).forEach((r) => {
                     if(!r || !r[0] || r[0].trim() === "") return;
-                    const dayKey = r[0].trim(); // A列: D0, D1...
+                    const dayKey = r[0].trim();
                     
                     if(!daysMap.has(dayKey)) {
-                        daysMap.set(dayKey, { 
-                            dayNum: dayKey, 
-                            dateLabel: r[1] || '', // B列: 日期
-                            mainTitle: r[3] || '', // D列: 地点总结
-                            events: [] 
-                        });
+                        daysMap.set(dayKey, { dayNum: dayKey, dateLabel: r[1] || '', mainTitle: r[3] || '', events: [] });
                     }
-                    if(r[4]) { // E列: Activity
-                        daysMap.get(dayKey).events.push({
-                            time: r[2] || '', // C列: Time
-                            act: r[4] || '',  // E列: Activity
-                            rem: r[5] || '',  // F列: Remarks
-                            map: r[6] || ''   // G列: Map Link
-                        });
+                    if(r[4]) {
+                        daysMap.get(dayKey).events.push({ time: r[2] || '', act: r[4] || '', rem: r[5] || '', map: r[6] || '' });
                     }
                 });
 
@@ -221,7 +243,6 @@
             }});
         }
 
-        // --- 🏨 酒店逻辑 (保持原样) ---
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -265,6 +286,8 @@
             expenses.unshift({ id: Date.now(), amount: amt, note: document.getElementById('note-input').value, payer: document.getElementById('payer-input').value, type: document.getElementById('type-input').value });
             localStorage.setItem('snow_trip_2027_v5', JSON.stringify(expenses));
             renderExpenses();
+            document.getElementById('amt-input').value = '';
+            document.getElementById('note-input').value = '';
         }
 
         function renderExpenses() {
@@ -277,7 +300,11 @@
                 const bal = paidMap[f] - avg;
                 return `<div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:2px 0;"><span>${f}</span><strong>${bal>=0?'+':''}${Math.round(bal).toLocaleString()}</strong></div>`;
             }).join('');
-            document.getElementById('expense-list').innerHTML = expenses.map(e => `<div class="input-card" style="margin-bottom:10px;"><strong>${e.note}</strong><br><small>${e.payer} • ${e.amount.toLocaleString()} JPY</small></div>`).join('');
+            document.getElementById('expense-list').innerHTML = expenses.map(e => `
+                <div class="expense-item-card">
+                    <div><strong>${e.note || '未命名账目'}</strong><br><small style="color:#888;">${e.payer} • ${e.type==='shared'?'共享AA':'个人私账'}</small></div>
+                    <div style="text-align:right; font-weight:800; color:var(--primary);">${e.amount.toLocaleString()} JPY</div>
+                </div>`).join('');
         }
     </script>
 </body>
