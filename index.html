@@ -125,15 +125,25 @@
         .pool-amount-display { font-size: 2.6rem; font-weight: 900; margin: 4px 0; letter-spacing: -1px; }
         
         .pool-members-box { background: rgba(0,0,0,0.15); border-radius: 14px; padding: 14px 16px; margin-top: 15px; text-align: left; }
-        .pool-member-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding: 9px 0; font-size: 0.9rem; font-weight: 700; }
+        
+        /* 🌟 核心适配修复 1：开启左右自适应轴，在 iPhone 极窄屏幕下强行禁止折行 */
+        .pool-member-row { 
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding: 9px 0; font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; 
+        }
         .pool-member-row:last-child { border-bottom: none; }
         
-        .member-profile-wrapper { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .pixel-avatar { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; background: rgba(255,255,255,0.2); image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.4); }
-        .fallback-avatar { width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: white; text-transform: uppercase; }
+        /* 🌟 核心适配修复 2：给名字区域单独设保护尺寸，保证头像、状态点和人名永不被挤扁 */
+        .member-profile-wrapper { display: flex; align-items: center; gap: 6px; width: 80px; flex-shrink: 0; overflow: hidden; }
+        .pixel-avatar { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; background: rgba(255,255,255,0.2); image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.4); flex-shrink: 0; }
+        .fallback-avatar { width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: white; text-transform: uppercase; flex-shrink: 0; }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: 2px; flex-shrink: 0; }
         
-        .status-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: 2px; }
-        .member-money-details { display: flex; justify-content: space-between; flex: 1; padding-left: 10px; }
+        /* 🌟 核心适配修复 3：右侧区域采用等宽数字（tabular-nums）与强行右对齐保护，多长都不爆 */
+        .member-money-details { 
+            display: flex; justify-content: space-between; align-items: center; flex: 1; min-width: 0; font-variant-numeric: tabular-nums; text-align: right; 
+        }
+        .member-money-details .txt-deposit { color: rgba(255,255,255,0.6); font-size: 0.8rem; font-weight: 500; white-space: nowrap; margin-left: auto; padding-right: 12px; }
+        .member-money-details .txt-balance { font-size: 0.88rem; font-weight: 800; white-space: nowrap; flex-shrink: 0; display: inline-block; min-width: 105px; text-align: right; }
 
         /* 录入区块卡片 */
         .input-card { background: white; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
@@ -170,7 +180,7 @@
 
         .btn-del { border: none; background: none; color: #CCC; font-size: 1.3rem; padding-left: 6px; cursor: pointer; }
 
-        /* 🔄 完美修复：单独提取并在右上方美化的刷新图标样式 */
+        /* 右上方美化的刷新图标样式 */
         .refresh-top-right-box {
             position: absolute; top: -38px; right: 4px; z-index: 99;
         }
@@ -191,7 +201,7 @@
 <body>
 
     <header>
-        <h1>2027 日本滑雪之旅 JAPAN TRIP</h1>
+        <h1>2027 滑雪局 SNOWBOARD TRIP</h1>
         <div class="header-meta-row">
             <div class="date-input-container">
                 <span style="font-size:0.85rem;">📅</span>
@@ -308,18 +318,20 @@
             settings: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhNo05QZLSeLmDn1urwikxrAAHPqhdZLF3W92pzUo1n3Fn472wMrOoRSkwEKnLAz1YW0l6K-yiyEmS/pub?gid=1064984576&single=true&output=csv'
         };
 
-        let friends = ["XK", "YM", "JY", "JP", "WS", "Patric", "CY", "ZK"];
+        // 🌟 修复 1：将 Patric 缩减修改为 PT
+        let friends = ["XK", "YM", "JY", "JP", "WS", "PT", "CY", "ZK"];
         let cloudExpenses = []; 
         let localExpenses = JSON.parse(localStorage.getItem('snow_trip_private_local_v1') || '[]'); 
 
+        // 🌟 修复 2：同步映射老图片 `Patric.png`
         const avatarMaps = {
             "XK": "XK.png", "YM": "YM.png", "JY": "JY.png", "JP": "JP.png",
-            "WS": "WS.png", "Patric": "Patric.png", "CY": "CY.png", "ZK": "ZK.png"
+            "WS": "WS.png", "PT": "Patric.png", "CY": "CY.png", "ZK": "ZK.png"
         };
 
         const avatarBgColors = {
             "XK": "#FF7675", "YM": "#FDCB6E", "JY": "#0984E3", "JP": "#00B894",
-            "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
+            "WS": "#6C5CE7", "PT": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
         };
 
         const MONTH_MAP = { 'JAN':0, 'FEB':1, 'MAR':2, 'APR':3, 'MAY':4, 'JUN':5, 'JUL':6, 'AUG':7, 'SEP':8, 'OCT':9, 'NOV':10, 'DEC':11 };
@@ -462,6 +474,11 @@
             }});
         }
 
+        function copyAddress(t) {
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert("✅ 地址已复制！");
+        }
+
         function handleAmountKeyUp(e) {
             if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
@@ -506,7 +523,11 @@
                 if(data && data.length > 1) {
                     let list = [];
                     for(let i=1; i<data.length; i++) {
-                        if(data[i][3]) list.push(data[i][3].trim());
+                        if(data[i][3]) {
+                            let name = data[i][3].trim();
+                            if (name === "Patric") name = "PT";
+                            list.push(name);
+                        }
                     }
                     if(list.length > 0) friends = list;
                 }
@@ -538,7 +559,12 @@
             fetch(CLOUD_API)
                 .then(response => response.json())
                 .then(data => {
-                    cloudExpenses = data;
+                    // 🌟 修复 3：旧流水拉取自动兼容 PT 转换
+                    cloudExpenses = data.map(e => {
+                        if (e.payer === "Patric") e.payer = "PT";
+                        if (e.involved) e.involved = e.involved.map(m => m === "Patric" ? "PT" : m);
+                        return e;
+                    });
                     renderExpenses();
                 })
                 .catch(err => {
@@ -642,6 +668,13 @@
 
             let combinedExpenses = [];
             cloudExpenses.forEach(e => { e.isCloud = true; combinedExpenses.push(e); });
+            
+            // 🌟 修复 4：本地私账老缓存同步转换为 PT 安全解析
+            localExpenses = localExpenses.map(e => {
+                if (e.payer === "Patric") e.payer = "PT";
+                if (e.involved) e.involved = e.involved.map(m => m === "Patric" ? "PT" : m);
+                return e;
+            });
             localExpenses.forEach(e => { e.isCloud = false; combinedExpenses.push(e); });
 
             combinedExpenses.sort((a, b) => {
@@ -699,7 +732,6 @@
                         badgeText = '<span style="color:var(--orange); font-weight:700;">[个人开销 • 独立]</span>';
                     }
 
-                    // 🌟 完美同步 3：更改云端小标记文案为 "Sync"
                     const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">Sync</span>` : `<span class="sync-badge badge-local">私密</span>`;
 
                     listCont.innerHTML += `
@@ -726,6 +758,7 @@
             let currentPoolBalance = initialPoolTotal - totalSpentFromPool;
             document.getElementById('pool-remaining').innerText = currentPoolBalance.toLocaleString() + ' JPY';
 
+            // 🌟 核心适配修复 5：左右双轨自适应，绑定高级防挤压 class 节点
             let membersHtml = '';
             friends.forEach(f => {
                 let myBalance = memberDepositMap[f] - memberSpentMap[f];
@@ -738,8 +771,8 @@
                     <div class="pool-member-row">
                         <div class="member-profile-wrapper">${avatarHtml}${fallbackHtml}<div class="status-dot" style="background:${myBalance >= 0 ? '#00FF00' : '#BC002D'};"></div><strong>${f}</strong></div>
                         <div class="member-money-details">
-                            <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto; padding-right:25px;">交了 ${memberDepositMap[f].toLocaleString()}</span>
-                            <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">Balance ${sign}${Math.round(myBalance).toLocaleString()}</span>
+                            <span class="txt-deposit">交了 ${memberDepositMap[f].toLocaleString()}</span>
+                            <span class="txt-balance" style="color:${color};">Balance ${sign}${Math.round(myBalance).toLocaleString()}</span>
                         </div>
                     </div>`;
             });
