@@ -41,30 +41,54 @@
         .banner-container { position: relative; width: 100%; margin-top: 12px; }
         .banner-img { width: 100%; border-radius: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* 天空半透明倒计时卡片面板 */
+        /* 🌟 优化后的天空半透明倒计时面板 */
         .countdown-sky-panel {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 52%;
-            height: 12%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            width: 58%; /* 稍微加宽一点适应大字 */
+            height: 14%; /* 稍微加高一点 */
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             border-bottom-left-radius: 20px;
             border-bottom-right-radius: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             pointer-events: none;
             z-index: 10;
         }
-        .countdown-label { font-size: 0.6rem; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
-        .countdown-timer-text { font-size: 0.72rem; font-weight: 900; color: var(--dark-red); letter-spacing: -0.2px; }
-        .countdown-timer-text span { font-size: 0.62rem; color: #333; font-weight: 700; margin: 0 1px; }
+        
+        /* 🌟 换成中文精美大标题 */
+        .countdown-label { 
+            font-size: 0.7rem; 
+            font-weight: 900; 
+            color: var(--dark-blue); 
+            letter-spacing: 0.5px; 
+            margin-bottom: 2px; 
+        }
+        
+        /* 🌟 整体大个字一点，并且利用 padding 拉开单位之间的距离 */
+        .countdown-timer-text { 
+            font-size: 0.9rem; /* 整体调大字号 */
+            font-weight: 900; 
+            color: var(--dark-red); 
+            letter-spacing: -0.2px; 
+        }
+        .countdown-timer-text span { 
+            font-size: 0.68rem; 
+            color: #444; 
+            font-weight: 800; 
+            margin-left: 1px;
+            padding-right: 6px; /* 🌟 右边加入内边距，让D H M S之间隔开大概一个空格的距离 */
+        }
+        .countdown-timer-text span:last-child {
+            padding-right: 0; /* 最后一个秒数后面不需要空格 */
+        }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
@@ -184,7 +208,7 @@
         
         <div class="banner-container">
             <div class="countdown-sky-panel">
-                <div class="countdown-label" id="cd-title">滑雪倒计时</div>
+                <div class="countdown-label" id="cd-title">日本滑雪倒计时</div>
                 <div class="countdown-timer-text" id="cd-timer">00<span>D</span>00<span>H</span>00<span>M</span>00<span>S</span></div>
             </div>
             <img src="banner.png" alt="Snowboard Banner" class="banner-img">
@@ -286,7 +310,6 @@
             "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
         };
 
-        // 月份英文简写映射表
         const MONTH_MAP = { 'JAN':0, 'FEB':1, 'MAR':2, 'APR':3, 'MAY':4, 'JUN':5, 'JUL':6, 'AUG':7, 'SEP':8, 'OCT':9, 'NOV':10, 'DEC':11 };
 
         window.onload = function() {
@@ -300,19 +323,17 @@
             loadHotels();
             loadItinerary();
             
-            // 🌟 开启完全由输入框驱动的动态倒计时
+            // 启动完全由输入框驱动的动态倒计时
             startDynamicCountdown();
         };
 
-        // 🌟 终极核心：动态捕获并解析输入日期的核心引擎
         function startDynamicCountdown() {
             function updateTimer() {
                 const dateInputStr = document.getElementById('editable-date').value || '4-MAR';
-                let targetTimestamp = new Date("2027/03/04 00:00:00").getTime(); // 默认兜底
+                let targetTimestamp = new Date("2027/03/04 00:00:00").getTime(); 
 
                 try {
-                    // 1. 自动截取第一个破折号前的内容，并剥离空格 (如 "4-MAR >>> 13-MAR" -> "4-MAR")
-                    const firstPart = dateInputStr.split('>>>')[0].trim().split('>>>')[0].trim();
+                    const firstPart = dateInputStr.split('>>>')[0].trim();
                     const dateMatch = firstPart.match(/^(\d+)-([A-Za-z]+)/);
                     
                     if (dateMatch) {
@@ -320,7 +341,6 @@
                         const monthStr = dateMatch[2].toUpperCase().substring(0, 3);
                         
                         if (MONTH_MAP[monthStr] !== undefined) {
-                            // 2. 完美组装出动态指定的 2027 出发零点时间戳
                             const parsedDate = new Date(2027, MONTH_MAP[monthStr], dayNum, 0, 0, 0);
                             targetTimestamp = parsedDate.getTime();
                         }
@@ -338,11 +358,10 @@
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-                    document.getElementById('cd-title').innerText = "滑雪倒计时";
+                    document.getElementById('cd-title').innerText = "日本滑雪倒计时";
                     document.getElementById('cd-timer').innerHTML = 
                         `${days}<span>D</span>${hours.toString().padStart(2,'0')}<span>H</span>${minutes.toString().padStart(2,'0')}<span>M</span>${seconds.toString().padStart(2,'0')}<span>S</span>`;
                 } else if (now >= targetTimestamp && now <= targetTimestamp + (10 * 24 * 60 * 60 * 1000)) {
-                    // 旅行开始后的 10 天内
                     document.getElementById('cd-title').innerText = "CURRENT STATUS";
                     document.getElementById('cd-timer').innerHTML = "<span style='font-size:0.75rem; color:#BC002D;'>🏂 旅行热战中！</span>";
                 } else {
@@ -352,7 +371,7 @@
             }
             
             updateTimer();
-            setInterval(updateTimer, 1000); // 秒级精度刷新
+            setInterval(updateTimer, 1000); 
         }
 
         function saveTripDate(val) { 
