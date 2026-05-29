@@ -36,7 +36,35 @@
         .header-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 0 4px; }
         .date-editable { border: none; background: #F5F7FA; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary); width: 160px; outline: none; }
         .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; }
-        .banner-img { width: 100%; border-radius: 12px; margin-top: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* 插画容器与动态天空倒计时布局 */
+        .banner-container { position: relative; width: 100%; margin-top: 12px; }
+        .banner-img { width: 100%; border-radius: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* 天空半透明倒计时卡片面板 */
+        .countdown-sky-panel {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 52%;
+            height: 12%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .countdown-label { font-size: 0.6rem; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
+        .countdown-timer-text { font-size: 0.72rem; font-weight: 900; color: var(--dark-red); letter-spacing: -0.2px; }
+        .countdown-timer-text span { font-size: 0.62rem; color: #333; font-weight: 700; margin: 0 1px; }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
@@ -116,7 +144,6 @@
         .btn-add { width: 100%; background: #1A1A1A; color: white; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-add:disabled { background: #888; cursor: not-allowed; }
 
-        /* 日期分组大标题样式 */
         .expense-group-title { font-size: 0.95rem; font-weight: 900; color: var(--dark-blue); margin: 20px 18px 10px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
         .expense-group-title::before { content: ""; display: inline-block; width: 4px; height: 14px; background: var(--primary); border-radius: 2px; }
 
@@ -154,7 +181,14 @@
             </div>
             <div class="credit-tag">Created by XingKai</div>
         </div>
-        <img src="banner.png" alt="Snowboard Banner" class="banner-img">
+        
+        <div class="banner-container">
+            <div class="countdown-sky-panel">
+                <div class="countdown-label" id="cd-title">滑雪倒计时</div>
+                <div class="countdown-timer-text" id="cd-timer">00<span>D</span>00<span>H</span>00<span>M</span>00<span>S</span></div>
+            </div>
+            <img src="banner.png" alt="Snowboard Banner" class="banner-img">
+        </div>
     </header>
 
     <div id="tab-itinerary" class="tab-content active">
@@ -252,6 +286,9 @@
             "WS": "#6C5CE7", "Patric": "#FAB1A0", "CY": "#E84393", "ZK": "#2D3436"
         };
 
+        // 月份英文简写映射表
+        const MONTH_MAP = { 'JAN':0, 'FEB':1, 'MAR':2, 'APR':3, 'MAY':4, 'JUN':5, 'JUL':6, 'AUG':7, 'SEP':8, 'OCT':9, 'NOV':10, 'DEC':11 };
+
         window.onload = function() {
             const savedDate = localStorage.getItem('snow_trip_custom_date') || '4-MAR >>> 13-MAR';
             document.getElementById('editable-date').value = savedDate;
@@ -262,9 +299,65 @@
             loadSettings(); 
             loadHotels();
             loadItinerary();
+            
+            // 🌟 开启完全由输入框驱动的动态倒计时
+            startDynamicCountdown();
         };
 
-        function saveTripDate(val) { localStorage.setItem('snow_trip_custom_date', val); }
+        // 🌟 终极核心：动态捕获并解析输入日期的核心引擎
+        function startDynamicCountdown() {
+            function updateTimer() {
+                const dateInputStr = document.getElementById('editable-date').value || '4-MAR';
+                let targetTimestamp = new Date("2027/03/04 00:00:00").getTime(); // 默认兜底
+
+                try {
+                    // 1. 自动截取第一个破折号前的内容，并剥离空格 (如 "4-MAR >>> 13-MAR" -> "4-MAR")
+                    const firstPart = dateInputStr.split('>>>')[0].trim().split('>>>')[0].trim();
+                    const dateMatch = firstPart.match(/^(\d+)-([A-Za-z]+)/);
+                    
+                    if (dateMatch) {
+                        const dayNum = parseInt(dateMatch[1]);
+                        const monthStr = dateMatch[2].toUpperCase().substring(0, 3);
+                        
+                        if (MONTH_MAP[monthStr] !== undefined) {
+                            // 2. 完美组装出动态指定的 2027 出发零点时间戳
+                            const parsedDate = new Date(2027, MONTH_MAP[monthStr], dayNum, 0, 0, 0);
+                            targetTimestamp = parsedDate.getTime();
+                        }
+                    }
+                } catch(e) {
+                    console.log("日期不符合标准格式，采用默认4-MAR倒计时");
+                }
+
+                const now = new Date().getTime();
+                
+                if (now < targetTimestamp) {
+                    const diff = targetTimestamp - now;
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    document.getElementById('cd-title').innerText = "滑雪倒计时";
+                    document.getElementById('cd-timer').innerHTML = 
+                        `${days}<span>D</span>${hours.toString().padStart(2,'0')}<span>H</span>${minutes.toString().padStart(2,'0')}<span>M</span>${seconds.toString().padStart(2,'0')}<span>S</span>`;
+                } else if (now >= targetTimestamp && now <= targetTimestamp + (10 * 24 * 60 * 60 * 1000)) {
+                    // 旅行开始后的 10 天内
+                    document.getElementById('cd-title').innerText = "CURRENT STATUS";
+                    document.getElementById('cd-timer').innerHTML = "<span style='font-size:0.75rem; color:#BC002D;'>🏂 旅行热战中！</span>";
+                } else {
+                    document.getElementById('cd-title').innerText = "TRIP END";
+                    document.getElementById('cd-timer').innerHTML = "<span style='font-size:0.75rem; color:#7F8C8D;'>❄️ 滑雪局圆满落幕</span>";
+                }
+            }
+            
+            updateTimer();
+            setInterval(updateTimer, 1000); // 秒级精度刷新
+        }
+
+        function saveTripDate(val) { 
+            localStorage.setItem('snow_trip_custom_date', val); 
+        }
 
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -288,7 +381,6 @@
             }
         }
 
-        // 数据流向控制
         function jumpToCategory() {
             const amt = document.getElementById('amt-input').value;
             if (amt && amt.trim() !== "") {
@@ -393,13 +485,6 @@
             }});
         }
 
-        function handlePayerChange(val) {
-            if(val !== "阿公钱" && document.getElementById('type-input').value === 'shared') {
-                const chk = document.getElementById(`user-chk-${val}`);
-                if(chk) chk.checked = true;
-            }
-        }
-
         function fetchCloudExpenses() {
             const icon = document.getElementById('refresh-icon');
             if(icon) icon.classList.add('spinning');
@@ -441,14 +526,7 @@
             }
             
             const newTx = {
-                id: Date.now() + Math.floor(Math.random()*1000), 
-                amount: amt, 
-                note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')), 
-                payer: payer, 
-                type: type, 
-                cat: cat, 
-                date: dateVal, 
-                involved: involvedMembers
+                id: Date.now() + Math.floor(Math.random()*1000), amount: amt, note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')), payer: payer, type: type, cat: cat, date: dateVal, involved: involvedMembers
             };
 
             if (type === 'individual_cost') {
@@ -498,7 +576,6 @@
             }
         }
 
-        // 分组且倒序排列的渲染逻辑
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
