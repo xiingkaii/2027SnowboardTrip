@@ -70,10 +70,10 @@
         .row-total .row-input-box { background: #000; }
         .row-total .row-input-box span, .row-total .dash-input { color: #FFEB3B; font-size: 1.05rem; }
 
-        /* 看板每行的小图标色彩定义 */
+        /* 看板色彩小标签样式定义 */
         .bg-ski { background: #FF7675; } .bg-flight { background: #74B9FF; } .bg-hotel { background: #A29BFE; }
         .bg-trans { background: #55E6C1; } .bg-food { background: #FAD390; } .bg-ticket { background: #81ECEC; }
-        .bg-ent { background: #FAB1A0; }
+        .bg-ent { background: #FAB1A0; } .bg-others { background: #95A5A6; }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
@@ -135,7 +135,7 @@
         .status-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: 2px; }
         .member-money-details { display: flex; justify-content: space-between; flex: 1; padding-left: 10px; }
 
-        /* 记账单张卡片 */
+        /* 录入区块卡片 */
         .input-card { background: white; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
         .form-input { 
@@ -169,6 +169,17 @@
         .badge-local { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
 
         .btn-del { border: none; background: none; color: #CCC; font-size: 1.3rem; padding-left: 6px; cursor: pointer; }
+
+        /* 🔄 完美修复：单独提取并在右上方美化的刷新图标样式 */
+        .refresh-top-right-box {
+            position: absolute; top: -38px; right: 4px; z-index: 99;
+        }
+        .refresh-action-trigger {
+            background: #FAFAFA; color: #333; border: 1.5px solid #EAEAEA; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.2s;
+        }
+        .refresh-action-trigger:active { background: #F0F0F0; transform: scale(0.95); }
+        .spinning { animation: spin 0.8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* 底栏 Tab Bar 固定样式 */
         .tab-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: white; border-radius: 50px; display: flex; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; }
@@ -207,6 +218,7 @@
             <div class="expense-row"><div class="row-icon bg-food"><i class="fas fa-utensils"></i></div><div class="row-label">餐饮 Dining</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="food" placeholder="0" oninput="calcTotal()"></div></div>
             <div class="expense-row"><div class="row-icon bg-ticket"><i class="fas fa-ticket-alt"></i></div><div class="row-label">门票 Tickets</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="ticket" placeholder="0" oninput="calcTotal()"></div></div>
             <div class="expense-row"><div class="row-icon bg-ent"><i class="fas fa-camera"></i></div><div class="row-label">娱乐 Ent.</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="ent" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-others"><i class="fas fa-puzzle-piece"></i></div><div class="row-label">其他 Others</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="others" placeholder="0" oninput="calcTotal()"></div></div>
             
             <div class="expense-row row-total"><div class="row-icon" style="background:#000;"><i class="fas fa-calculator"></i></div><div class="row-label">TOTAL</div><div class="row-input-box"><span>RM</span><input type="text" id="dash-total" class="dash-input" value="0" readonly></div></div>
         </div>
@@ -221,8 +233,11 @@
     </div>
 
     <div id="tab-expense" class="tab-content">
-        <div class="pool-panel">
-            <button class="refresh-btn" onclick="fetchCloudExpenses()"><i id="refresh-icon" class="fas fa-sync-alt"></i></button>
+        <div class="pool-panel" style="margin-top: 50px;">
+            <div class="refresh-top-right-box">
+                <button class="refresh-action-trigger" onclick="fetchCloudExpenses()"><i id="refresh-icon" class="fas fa-sync-alt"></i></button>
+            </div>
+            
             <span class="pool-label-badge">阿公钱 余额</span>
             <div class="pool-amount-display" id="pool-remaining">0 JPY</div>
             
@@ -323,7 +338,6 @@
             loadDashData();
         };
 
-        // 🌟 1. 完善并保留：多 Tab 智能防白屏切换逻辑与 Banner 隐藏
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
@@ -345,7 +359,6 @@
             }
         }
 
-        // 🌟 2. 完善并保留：由输入框动态驱动的拉开间距中文大倒计时
         function startDynamicCountdown() {
             function updateTimer() {
                 const dateInputStr = document.getElementById('editable-date').value || '4-MAR';
@@ -385,7 +398,6 @@
             setInterval(updateTimer, 1000); 
         }
 
-        // 🌟 3. 完整复原：700行版本中最高级的、带展开攻略和双链接的【行程卡片加载引擎】
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -423,7 +435,6 @@
             }});
         }
 
-        // 🌟 4. 完整复原：完美的、带灰色块内底排版和无缝复制按键的【酒店卡片加载引擎】
         function loadHotels() {
             Papa.parse(urls.hotel, { download: true, complete: (res) => {
                 const data = res.data;
@@ -451,12 +462,6 @@
             }});
         }
 
-        function copyAddress(t) {
-            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("✅ 地址已复制！");
-        }
-
-        // 🌟 5. 完善并保留：流水线式的快捷键盘唤醒与聚焦机制
         function handleAmountKeyUp(e) {
             if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
@@ -473,7 +478,6 @@
             setTimeout(() => { document.getElementById('note-input').focus(); }, 50);
         }
 
-        // 🌟 6. 完善并保留：Travel Expenses 看板独立存储与实时计算总账逻辑
         function calcTotal() {
             let total = 0;
             const inputs = document.querySelectorAll('.dash-input:not(#dash-total)');
@@ -496,7 +500,6 @@
             calcTotal();
         }
 
-        // 🌟 7. 完整复原：高灵敏度的 8 人团队实时金库、Sync/私密分流及按日期大分类归账引擎
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -614,6 +617,18 @@
             }
         }
 
+        function deleteEx(id, isLocal) {
+            if(confirm("确定删除这笔账单记录吗?")) {
+                if (isLocal) {
+                    localExpenses = localExpenses.filter(e => e.id !== id);
+                    localStorage.setItem('snow_trip_private_local_v1', JSON.stringify(localExpenses));
+                    renderExpenses();
+                } else {
+                    alert("💡 云端同步的公账无法直接在手机删除，请通知 XK 在 Google Sheet 试算表内直接删改。");
+                }
+            }
+        }
+
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
@@ -684,6 +699,7 @@
                         badgeText = '<span style="color:var(--orange); font-weight:700;">[个人开销 • 独立]</span>';
                     }
 
+                    // 🌟 完美同步 3：更改云端小标记文案为 "Sync"
                     const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">Sync</span>` : `<span class="sync-badge badge-local">私密</span>`;
 
                     listCont.innerHTML += `
@@ -723,7 +739,7 @@
                         <div class="member-profile-wrapper">${avatarHtml}${fallbackHtml}<div class="status-dot" style="background:${myBalance >= 0 ? '#00FF00' : '#BC002D'};"></div><strong>${f}</strong></div>
                         <div class="member-money-details">
                             <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto; padding-right:25px;">交了 ${memberDepositMap[f].toLocaleString()}</span>
-                            <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">(Balance ${sign}${Math.round(myBalance).toLocaleString()})</span>
+                            <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">Balance ${sign}${Math.round(myBalance).toLocaleString()}</span>
                         </div>
                     </div>`;
             });
