@@ -37,41 +37,49 @@
         .date-editable { border: none; background: #F5F7FA; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary); width: 160px; outline: none; }
         .credit-tag { font-size: 0.65rem; color: rgba(0, 0, 0, 0.25) !important; font-weight: 400; text-align: right; }
         
-        /* 插画容器与动态天空倒计时布局 */
+        /* 插画与倒计时容器 */
         .banner-container { position: relative; width: 100%; margin-top: 12px; }
         .banner-img { width: 100%; border-radius: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* 天空半透明动态倒计时卡片面板 */
+        /* 天空圆角倒计时卡片面板 */
         .countdown-sky-panel {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 58%; 
-            height: 14%; 
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            pointer-events: none;
-            z-index: 10;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 58%; height: 14%; background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); pointer-events: none; z-index: 10;
         }
         .countdown-label { font-size: 0.7rem; font-weight: 900; color: var(--dark-blue); letter-spacing: 0.5px; margin-bottom: 2px; }
         .countdown-timer-text { font-size: 0.9rem; font-weight: 900; color: var(--dark-red); letter-spacing: -0.2px; }
         .countdown-timer-text span { font-size: 0.68rem; color: #444; font-weight: 800; margin-left: 1px; padding-right: 6px; }
         .countdown-timer-text span:last-child { padding-right: 0; }
 
+        /* 🌟 记账 Tab 专属：Travel Expenses 看板手绘卡片风格 */
+        .travel-dashboard {
+            background: #E53935; border-radius: 18px; margin: 12px 0 0 0; padding: 14px 12px; box-shadow: 0 8px 25px rgba(229, 57, 53, 0.2); border: 2.5px solid #000;
+        }
+        .dashboard-header { color: white; text-align: center; font-weight: 900; font-size: 1.1rem; letter-spacing: 1.5px; padding: 2px 0 10px 0; border-bottom: 2px dashed rgba(255,255,255,0.3); margin-bottom: 12px; font-family: "Comfortaa"; }
+        
+        .expense-row { display: flex; align-items: center; background: white; border-radius: 10px; margin-bottom: 8px; height: 38px; overflow: hidden; border: 2px solid #000; }
+        .row-icon { width: 42px; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; color: white; border-right: 2px solid #000; flex-shrink: 0; }
+        .row-label { flex: 1; padding-left: 10px; font-weight: 800; font-size: 0.85rem; color: #333; }
+        .row-input-box { width: 110px; height: 100%; display: flex; align-items: center; background: #fff; padding-right: 8px; }
+        .row-input-box span { font-size: 0.75rem; font-weight: 800; color: #666; margin-right: 4px; }
+        .dash-input { width: 100%; border: none; outline: none; background: transparent; font-weight: 900; font-size: 0.9rem; text-align: right; color: #000; }
+        
+        .row-total { background: #000; margin-top: 14px; }
+        .row-total .row-label { color: #FFEB3B; font-size: 0.95rem; }
+        .row-total .row-input-box { background: #000; }
+        .row-total .row-input-box span, .row-total .dash-input { color: #FFEB3B; font-size: 1.05rem; }
+
+        /* 看板每行的小图标色彩定义 */
+        .bg-ski { background: #FF7675; } .bg-flight { background: #74B9FF; } .bg-hotel { background: #A29BFE; }
+        .bg-trans { background: #55E6C1; } .bg-food { background: #FAD390; } .bg-ticket { background: #81ECEC; }
+        .bg-ent { background: #FAB1A0; }
+
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* --- 📅 行程 Tab --- */
+        /* --- 📅 行程 Tab 排版 --- */
         .itinerary-card { background: white; border-radius: 12px; margin: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .itinerary-header { display: flex; height: 75px; cursor: pointer; align-items: stretch; }
         .itinerary-day-box { background: var(--dark-red); color: white; width: 75px; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0; }
@@ -93,7 +101,7 @@
         .btn-map-small { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
         .btn-ref-small { background: #FFEBEE; color: #C41E3A; border: 1px solid #FFCDD2; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: background 0.2s; }
 
-        /* --- 🏨 酒店 Tab --- */
+        /* --- 🏨 酒店 Tab 排版 --- */
         .hotel-card { background: white; border-radius: 16px; margin: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: left; border: 1px solid rgba(0,0,0,0.01); }
         .hotel-tag { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
         .tag-airbnb { background: #E8F5E9; color: #2E7D32; }
@@ -109,7 +117,7 @@
         .btn-nav-large { flex: 2; background: #BC002D; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; }
         .btn-copy-large { flex: 1; background: #EAEAEA; color: #333; text-align: center; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* --- 💰 记账 Tab --- */
+        /* --- 💰 记账 Tab 排版 --- */
         .pool-panel { 
             background: #BC002D; color: white; margin: 15px; padding: 22px 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(188,0,45,0.25); position: relative;
         }
@@ -127,7 +135,7 @@
         .status-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: 2px; }
         .member-money-details { display: flex; justify-content: space-between; flex: 1; padding-left: 10px; }
 
-        /* 操作区域 */
+        /* 记账单张卡片 */
         .input-card { background: white; margin: 15px; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
         .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
         .form-input { 
@@ -160,14 +168,12 @@
         .badge-cloud { background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB; }
         .badge-local { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
 
-        .refresh-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
-        .refresh-btn:active { background: rgba(255,255,255,0.4); }
-        .spinning { animation: spin 0.8s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .btn-del { border: none; background: none; color: #CCC; font-size: 1.3rem; padding-left: 6px; cursor: pointer; }
 
-        /* 底栏 Tab Bar */
+        /* 底栏 Tab Bar 固定样式 */
         .tab-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: white; border-radius: 50px; display: flex; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; }
-        .tab-item { flex: 1; text-align: center; color: #aaa; padding: 8px 0; border-radius: 30px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .tab-item { flex: 1; text-align: center; color: #aaa; padding: 8px 0; border-radius: 30px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-item i { font-size: 1.15rem; }
         .tab-item.active { background: #FEE8EC; color: var(--primary); }
     </style>
 </head>
@@ -183,12 +189,26 @@
             <div class="credit-tag">Created by XingKai</div>
         </div>
         
-        <div class="banner-container">
+        <div id="top-banner-section" class="banner-container">
             <div class="countdown-sky-panel">
                 <div class="countdown-label" id="cd-title">日本滑雪倒计时</div>
                 <div class="countdown-timer-text" id="cd-timer">00<span>D</span>00<span>H</span>00<span>M</span>00<span>S</span></div>
             </div>
             <img src="banner.png" alt="Snowboard Banner" class="banner-img">
+        </div>
+
+        <div id="travel-dashboard-section" class="travel-dashboard" style="display:none;">
+            <div class="dashboard-header">TRAVEL EXPENSES</div>
+            
+            <div class="expense-row"><div class="row-icon bg-ski"><i class="fas fa-snowboarding"></i></div><div class="row-label">滑雪 Skiing</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="ski" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-flight"><i class="fas fa-plane"></i></div><div class="row-label">机票 Flight</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="flight" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-hotel"><i class="fas fa-bed"></i></div><div class="row-label">住宿 Hotel</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="hotel" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-trans"><i class="fas fa-train"></i></div><div class="row-label">交通 Transport</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="trans" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-food"><i class="fas fa-utensils"></i></div><div class="row-label">餐饮 Dining</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="food" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-ticket"><i class="fas fa-ticket-alt"></i></div><div class="row-label">门票 Tickets</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="ticket" placeholder="0" oninput="calcTotal()"></div></div>
+            <div class="expense-row"><div class="row-icon bg-ent"><i class="fas fa-camera"></i></div><div class="row-label">娱乐 Ent.</div><div class="row-input-box"><span>RM</span><input type="number" class="dash-input" data-cat="ent" placeholder="0" oninput="calcTotal()"></div></div>
+            
+            <div class="expense-row row-total"><div class="row-icon" style="background:#000;"><i class="fas fa-calculator"></i></div><div class="row-label">TOTAL</div><div class="row-input-box"><span>RM</span><input type="text" id="dash-total" class="dash-input" value="0" readonly></div></div>
         </div>
     </header>
 
@@ -249,20 +269,20 @@
         <div id="expense-list"></div>
     </div>
 
-    <div class="tab-bar">
+    <nav class="tab-bar">
         <div class="tab-item active" onclick="switchTab('itinerary', this)">
-            <i class="fas fa-calendar-alt" style="font-size: 1.2rem;"></i>
+            <i class="fas fa-calendar-alt"></i>
             <span>行程</span>
         </div>
         <div class="tab-item" onclick="switchTab('hotel', this)">
-            <i class="fas fa-hotel" style="font-size: 1.2rem;"></i>
+            <i class="fas fa-hotel"></i>
             <span>酒店</span>
         </div>
         <div class="tab-item" onclick="switchTab('expense', this)">
-            <i class="fas fa-coins" style="font-size: 1.2rem;"></i>
+            <i class="fas fa-coins"></i>
             <span>记账</span>
         </div>
-    </div>
+    </nav>
 
     <script>
         const CLOUD_API = 'https://script.google.com/macros/s/AKfycbxSL5ZmHK7Ua72_q6bWpiBMglignWhyh7r2MofhbUrzK8nyzMbccjt4K7i7WfkqB3tL/exec';
@@ -300,8 +320,32 @@
             loadHotels();
             loadItinerary();
             startDynamicCountdown();
+            loadDashData();
         };
 
+        // 🌟 1. 完善并保留：多 Tab 智能防白屏切换逻辑与 Banner 隐藏
+        function switchTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+
+            const banner = document.getElementById('top-banner-section');
+            const dash = document.getElementById('travel-dashboard-section');
+
+            if (id === 'expense') {
+                banner.style.display = 'none'; 
+                dash.style.display = 'block'; 
+                fetchCloudExpenses();
+            } else {
+                banner.style.display = 'block'; 
+                dash.style.display = 'none';
+                if(id === 'itinerary') loadItinerary(); 
+                if(id === 'hotel') loadHotels();
+            }
+        }
+
+        // 🌟 2. 完善并保留：由输入框动态驱动的拉开间距中文大倒计时
         function startDynamicCountdown() {
             function updateTimer() {
                 const dateInputStr = document.getElementById('editable-date').value || '4-MAR';
@@ -310,32 +354,25 @@
                 try {
                     const firstPart = dateInputStr.split('>>>')[0].trim();
                     const dateMatch = firstPart.match(/^(\d+)-([A-Za-z]+)/);
-                    
                     if (dateMatch) {
                         const dayNum = parseInt(dateMatch[1]);
                         const monthStr = dateMatch[2].toUpperCase().substring(0, 3);
-                        
                         if (MONTH_MAP[monthStr] !== undefined) {
-                            const parsedDate = new Date(2027, MONTH_MAP[monthStr], dayNum, 0, 0, 0);
-                            targetTimestamp = parsedDate.getTime();
+                            targetTimestamp = new Date(2027, MONTH_MAP[monthStr], dayNum, 0, 0, 0).getTime();
                         }
                     }
-                } catch(e) {
-                    console.log("日期格式有误，采用默认值");
-                }
+                } catch(e){}
 
                 const now = new Date().getTime();
-                
                 if (now < targetTimestamp) {
                     const diff = targetTimestamp - now;
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
 
                     document.getElementById('cd-title').innerText = "日本滑雪倒计时";
-                    document.getElementById('cd-timer').innerHTML = 
-                        `${days}<span>D</span>${hours.toString().padStart(2,'0')}<span>H</span>${minutes.toString().padStart(2,'0')}<span>M</span>${seconds.toString().padStart(2,'0')}<span>S</span>`;
+                    document.getElementById('cd-timer').innerHTML = `${d}<span>D</span>${h.toString().padStart(2,'0')}<span>H</span>${m.toString().padStart(2,'0')}<span>M</span>${s.toString().padStart(2,'0')}<span>S</span>`;
                 } else if (now >= targetTimestamp && now <= targetTimestamp + (10 * 24 * 60 * 60 * 1000)) {
                     document.getElementById('cd-title').innerText = "CURRENT STATUS";
                     document.getElementById('cd-timer').innerHTML = "<span style='font-size:0.75rem; color:#BC002D;'>🏂 旅行热战中！</span>";
@@ -344,80 +381,11 @@
                     document.getElementById('cd-timer').innerHTML = "<span style='font-size:0.75rem; color:#7F8C8D;'>❄️ 滑雪局圆满落幕</span>";
                 }
             }
-            
             updateTimer();
             setInterval(updateTimer, 1000); 
         }
 
-        function saveTripDate(val) { 
-            localStorage.setItem('snow_trip_custom_date', val); 
-        }
-
-        function switchTab(id, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            
-            if(id === 'itinerary') loadItinerary();
-            if(id === 'hotel') loadHotels();
-            if(id === 'expense') fetchCloudExpenses();
-        }
-
-        function toggleInvolvementSection(type) {
-            document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none';
-        }
-
-        function handleAmountKeyUp(e) {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-                document.getElementById('amt-input').blur(); 
-            }
-        }
-
-        function jumpToCategory() {
-            const amt = document.getElementById('amt-input').value;
-            if (amt && amt.trim() !== "") {
-                setTimeout(() => { document.getElementById('cat-input').focus(); }, 50);
-            }
-        }
-
-        function jumpToNote() {
-            setTimeout(() => { document.getElementById('note-input').focus(); }, 50);
-        }
-
-        function loadHotels() {
-            Papa.parse(urls.hotel, { download: true, complete: (res) => {
-                const data = res.data;
-                const cont = document.getElementById('hotel-container');
-                if(!data) return;
-                cont.innerHTML = "";
-                data.slice(1).forEach(h => {
-                    if(!h || !h[2] || h[2].trim() === "") return;
-                    const tag = h[4] || '住宿';
-                    const tagClass = tag.toLowerCase().includes('airbnb') ? 'tag-airbnb' : 'tag-hotel';
-                    const addr = h[3] || '暂无地址';
-                    const remark = h[5] ? `<div class="hotel-remark-text">${h[5].replace(/\n/g, '<br>')}</div>` : '';
-                    cont.innerHTML += `
-                        <div class="hotel-card">
-                            <span class="hotel-tag ${tagClass}">${tag}</span>
-                            <div class="hotel-title-row"><i class="fas fa-map-marker-alt hotel-icon-pin"></i><div class="hotel-title-text">${h[1]}：${h[2]}</div></div>
-                            <div class="hotel-date-text">${h[0] || ''}</div>
-                            <div class="hotel-content-container"><div class="hotel-address-text">${addr}</div>${remark}</div>
-                            <div class="hotel-action-buttons">
-                                ${h[6] ? `<a href="${h[6]}" target="_blank" class="btn-nav-large"><i class="fas fa-paper-plane"></i> 导航前往</a>` : '<button class="btn-nav-large" disabled>暂无位置</button>'}
-                                <button class="btn-copy-large" onclick="copyAddress('${addr.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> 复制地址</button>
-                            </div>
-                        </div>`;
-                });
-            }});
-        }
-
-        function copyAddress(t) {
-            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("✅ 地址已复制！");
-        }
-
+        // 🌟 3. 完整复原：700行版本中最高级的、带展开攻略和双链接的【行程卡片加载引擎】
         function loadItinerary() {
             Papa.parse(urls.itinerary, { download: true, complete: (res) => {
                 const data = res.data;
@@ -455,6 +423,80 @@
             }});
         }
 
+        // 🌟 4. 完整复原：完美的、带灰色块内底排版和无缝复制按键的【酒店卡片加载引擎】
+        function loadHotels() {
+            Papa.parse(urls.hotel, { download: true, complete: (res) => {
+                const data = res.data;
+                const cont = document.getElementById('hotel-container');
+                if(!data) return;
+                cont.innerHTML = "";
+                data.slice(1).forEach(h => {
+                    if(!h || !h[2] || h[2].trim() === "") return;
+                    const tag = h[4] || '住宿';
+                    const tagClass = tag.toLowerCase().includes('airbnb') ? 'tag-airbnb' : 'tag-hotel';
+                    const addr = h[3] || '暂无地址';
+                    const remark = h[5] ? `<div class="hotel-remark-text">${h[5].replace(/\n/g, '<br>')}</div>` : '';
+                    cont.innerHTML += `
+                        <div class="hotel-card">
+                            <span class="hotel-tag ${tagClass}">${tag}</span>
+                            <div class="hotel-title-row"><i class="fas fa-map-marker-alt hotel-icon-pin"></i><div class="hotel-title-text">${h[1]}：${h[2]}</div></div>
+                            <div class="hotel-date-text">${h[0] || ''}</div>
+                            <div class="hotel-content-container"><div class="hotel-address-text">${addr}</div>${remark}</div>
+                            <div class="hotel-action-buttons">
+                                ${h[6] ? `<a href="${h[6]}" target="_blank" class="btn-nav-large"><i class="fas fa-paper-plane"></i> 导航前往</a>` : '<button class="btn-nav-large" disabled>暂无位置</button>'}
+                                <button class="btn-copy-large" onclick="copyAddress('${addr.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> 复制地址</button>
+                            </div>
+                        </div>`;
+                });
+            }});
+        }
+
+        function copyAddress(t) {
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert("✅ 地址已复制！");
+        }
+
+        // 🌟 5. 完善并保留：流水线式的快捷键盘唤醒与聚焦机制
+        function handleAmountKeyUp(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                document.getElementById('amt-input').blur(); 
+            }
+        }
+        function jumpToCategory() {
+            const amt = document.getElementById('amt-input').value;
+            if (amt && amt.trim() !== "") {
+                setTimeout(() => { document.getElementById('cat-input').focus(); }, 50);
+            }
+        }
+        function jumpToNote() {
+            setTimeout(() => { document.getElementById('note-input').focus(); }, 50);
+        }
+
+        // 🌟 6. 完善并保留：Travel Expenses 看板独立存储与实时计算总账逻辑
+        function calcTotal() {
+            let total = 0;
+            const inputs = document.querySelectorAll('.dash-input:not(#dash-total)');
+            let data = {};
+            inputs.forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                total += val;
+                data[input.dataset.cat] = input.value;
+            });
+            document.getElementById('dash-total').value = total.toLocaleString();
+            localStorage.setItem('snow_trip_dash_data', JSON.stringify(data));
+        }
+
+        function loadDashData() {
+            const saved = JSON.parse(localStorage.getItem('snow_trip_dash_data') || '{}');
+            const inputs = document.querySelectorAll('.dash-input:not(#dash-total)');
+            inputs.forEach(input => {
+                if(saved[input.dataset.cat]) input.value = saved[input.dataset.cat];
+            });
+            calcTotal();
+        }
+
+        // 🌟 7. 完整复原：高灵敏度的 8 人团队实时金库、Sync/私密分流及按日期大分类归账引擎
         function loadSettings() {
             Papa.parse(urls.settings, { download: true, complete: (res) => {
                 const data = res.data;
@@ -479,6 +521,13 @@
             }});
         }
 
+        function handlePayerChange(val) {
+            if(val !== "阿公钱" && document.getElementById('type-input').value === 'shared') {
+                const chk = document.getElementById(`user-chk-${val}`);
+                if(chk) chk.checked = true;
+            }
+        }
+
         function fetchCloudExpenses() {
             const icon = document.getElementById('refresh-icon');
             if(icon) icon.classList.add('spinning');
@@ -490,7 +539,7 @@
                     renderExpenses();
                 })
                 .catch(err => {
-                    console.error("加载云端同步失败", err);
+                    console.error("加载云端数据失败", err);
                     renderExpenses();
                 })
                 .finally(() => {
@@ -565,18 +614,6 @@
             }
         }
 
-        function deleteEx(id, isLocal) {
-            if(confirm("确定删除这笔账单记录吗?")) {
-                if (isLocal) {
-                    localExpenses = localExpenses.filter(e => e.id !== id);
-                    localStorage.setItem('snow_trip_private_local_v1', JSON.stringify(localExpenses));
-                    renderExpenses();
-                } else {
-                    alert("💡 云端同步的公账无法直接在手机删除，请通知 XK 在 Google Sheet 试算表内直接删改。");
-                }
-            }
-        }
-
         function renderExpenses() {
             let initialPoolTotal = 0; 
             let totalSpentFromPool = 0; 
@@ -637,9 +674,8 @@
                     let isIndividual = false;
                     let displayNote = e.note;
                     
-                    // 🌟 换字优化 3：流水线渲染逻辑重构
                     if (e.type === 'personal') {
-                        displayNote = "Top Up阿公钱"; // 强制充值叫这个名字
+                        displayNote = "Top Up阿公钱"; 
                         badgeText = '<span style="color:#2E7D32; font-weight:700;">[Top Up]</span>';
                     } else if (e.type === 'shared') {
                         badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${e.involved ? e.involved.length : 8}人]</span>`;
@@ -648,7 +684,6 @@
                         badgeText = '<span style="color:var(--orange); font-weight:700;">[个人开销 • 独立]</span>';
                     }
 
-                    // 🌟 换字优化 4：“云端”换成“Sync”
                     const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">Sync</span>` : `<span class="sync-badge badge-local">私密</span>`;
 
                     listCont.innerHTML += `
@@ -664,7 +699,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="countdown-timer-text: inherit; expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
+                            <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
                                 <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
                                 <button class="btn-del" onclick="deleteEx(${e.id}, ${!e.isCloud})">×</button>
                             </div>
@@ -694,6 +729,9 @@
             });
             document.getElementById('members-list-container').innerHTML = membersHtml;
         }
+
+        function saveTripDate(val) { localStorage.setItem('snow_trip_custom_date', val); }
+        function toggleInvolvementSection(type) { document.getElementById('involvement-section').style.display = (type === 'shared') ? 'block' : 'none'; }
     </script>
 </body>
 </html>
