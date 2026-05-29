@@ -41,14 +41,14 @@
         .banner-container { position: relative; width: 100%; margin-top: 12px; }
         .banner-img { width: 100%; border-radius: 12px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* 🌟 优化后的天空半透明倒计时面板 */
+        /* 天空半透明动态倒计时卡片面板 */
         .countdown-sky-panel {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 58%; /* 稍微加宽一点适应大字 */
-            height: 14%; /* 稍微加高一点 */
+            width: 58%; 
+            height: 14%; 
             background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
@@ -62,33 +62,10 @@
             pointer-events: none;
             z-index: 10;
         }
-        
-        /* 🌟 换成中文精美大标题 */
-        .countdown-label { 
-            font-size: 0.7rem; 
-            font-weight: 900; 
-            color: var(--dark-blue); 
-            letter-spacing: 0.5px; 
-            margin-bottom: 2px; 
-        }
-        
-        /* 🌟 整体大个字一点，并且利用 padding 拉开单位之间的距离 */
-        .countdown-timer-text { 
-            font-size: 0.9rem; /* 整体调大字号 */
-            font-weight: 900; 
-            color: var(--dark-red); 
-            letter-spacing: -0.2px; 
-        }
-        .countdown-timer-text span { 
-            font-size: 0.68rem; 
-            color: #444; 
-            font-weight: 800; 
-            margin-left: 1px;
-            padding-right: 6px; /* 🌟 右边加入内边距，让D H M S之间隔开大概一个空格的距离 */
-        }
-        .countdown-timer-text span:last-child {
-            padding-right: 0; /* 最后一个秒数后面不需要空格 */
-        }
+        .countdown-label { font-size: 0.7rem; font-weight: 900; color: var(--dark-blue); letter-spacing: 0.5px; margin-bottom: 2px; }
+        .countdown-timer-text { font-size: 0.9rem; font-weight: 900; color: var(--dark-red); letter-spacing: -0.2px; }
+        .countdown-timer-text span { font-size: 0.68rem; color: #444; font-weight: 800; margin-left: 1px; padding-right: 6px; }
+        .countdown-timer-text span:last-child { padding-right: 0; }
 
         .tab-content { display: none; animation: fadeIn 0.3s; text-align: left; } 
         .tab-content.active { display: block; }
@@ -236,13 +213,13 @@
         </div>
 
         <div class="input-card">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式说明：个人开销记录将完全独立，绝不影响公款池余额</div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #666; margin-bottom: 8px;">🔧 模式说明：***用阿公钱或者topup，其他人都看到；***个人开销是privacy，其他人看不到</div>
             <div class="form-row">
                 <select id="payer-input" class="form-input" style="color:var(--primary); background:#FFF0F2; border:1px solid #FFCDD2;" onchange="handlePayerChange(this.value)"></select>
                 <select id="type-input" class="form-input" onchange="toggleInvolvementSection(this.value)">
-                    <option value="shared">👨‍👩‍👧‍👦 共享AA (云同步 • 扣公款)</option>
-                    <option value="personal">👤 个人充值 (云同步 • 进大池)</option>
-                    <option value="individual_cost">🔒 个人开销 (本手机保密 • 不扣公款)</option>
+                    <option value="shared">👨‍👩‍👧‍👦 扣阿公钱</option>
+                    <option value="personal">👤 Top up阿公钱</option>
+                    <option value="individual_cost">🔒 个人开销</option>
                 </select>
             </div>
             
@@ -322,8 +299,6 @@
             loadSettings(); 
             loadHotels();
             loadItinerary();
-            
-            // 启动完全由输入框驱动的动态倒计时
             startDynamicCountdown();
         };
 
@@ -346,7 +321,7 @@
                         }
                     }
                 } catch(e) {
-                    console.log("日期不符合标准格式，采用默认4-MAR倒计时");
+                    console.log("日期格式有误，采用默认值");
                 }
 
                 const now = new Date().getTime();
@@ -545,7 +520,14 @@
             }
             
             const newTx = {
-                id: Date.now() + Math.floor(Math.random()*1000), amount: amt, note: note || (type === 'shared' ? '共享活动消费' : (type === 'individual_cost' ? '个人私账消费' : '公款金库充值')), payer: payer, type: type, cat: cat, date: dateVal, involved: involvedMembers
+                id: Date.now() + Math.floor(Math.random()*1000), 
+                amount: amt, 
+                note: note || (type === 'shared' ? '共享AA消费' : (type === 'individual_cost' ? '个人私账消费' : 'Top Up阿公钱')), 
+                payer: payer, 
+                type: type, 
+                cat: cat, 
+                date: dateVal, 
+                involved: involvedMembers
             };
 
             if (type === 'individual_cost') {
@@ -554,7 +536,7 @@
                 document.getElementById('amt-input').value = '';
                 document.getElementById('note-input').value = '';
                 renderExpenses();
-                alert("🔒 个人私账已保密存入本机！");
+                alert("🔒 个人开销已保密存入本机！");
             } else {
                 const btn = document.getElementById('submit-btn');
                 btn.disabled = true;
@@ -653,17 +635,21 @@
                 txList.forEach(e => {
                     let badgeText = '';
                     let isIndividual = false;
+                    let displayNote = e.note;
                     
+                    // 🌟 换字优化 3：流水线渲染逻辑重构
                     if (e.type === 'personal') {
-                        badgeText = '<span style="color:#2E7D32; font-weight:700;">[大池注入]</span>';
+                        displayNote = "Top Up阿公钱"; // 强制充值叫这个名字
+                        badgeText = '<span style="color:#2E7D32; font-weight:700;">[Top Up]</span>';
                     } else if (e.type === 'shared') {
                         badgeText = `<span style="color:var(--primary); font-weight:700;">[公款扣除 • ${e.involved ? e.involved.length : 8}人]</span>`;
                     } else if (e.type === 'individual_cost') {
                         isIndividual = true;
-                        badgeText = '<span style="color:var(--orange); font-weight:700;">[个人私账 • 独立]</span>';
+                        badgeText = '<span style="color:var(--orange); font-weight:700;">[个人开销 • 独立]</span>';
                     }
 
-                    const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">云端</span>` : `<span class="sync-badge badge-local">私密</span>`;
+                    // 🌟 换字优化 4：“云端”换成“Sync”
+                    const syncTag = e.isCloud ? `<span class="sync-badge badge-cloud">Sync</span>` : `<span class="sync-badge badge-local">私密</span>`;
 
                     listCont.innerHTML += `
                         <div class="expense-item-card">
@@ -672,13 +658,13 @@
                                     <i class="${e.type==='shared'?'fas fa-shopping-basket':(e.type==='individual_cost'?'fas fa-user-lock':'fas fa-vault')}"></i>
                                 </div>
                                 <div>
-                                    <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${e.note} ${syncTag}</div>
+                                    <div style="font-weight:800; font-size:1.05rem; color:#2D3436;">${displayNote} ${syncTag}</div>
                                     <div style="font-size:0.75rem; color:#888; margin-top:2px;">
-                                        经手人: <strong>${e.payer}</strong> • ${badgeText}
+                                        <strong>${e.payer}</strong> • ${badgeText}
                                     </div>
                                 </div>
                             </div>
-                            <div class="expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
+                            <div class="countdown-timer-text: inherit; expense-item-price ${isIndividual ? 'personal-cost-style' : ''}">
                                 <span>${e.amount.toLocaleString()}</span> <small style="font-size:0.65rem; font-weight:700;">JPY</small>
                                 <button class="btn-del" onclick="deleteEx(${e.id}, ${!e.isCloud})">×</button>
                             </div>
@@ -702,7 +688,7 @@
                         <div class="member-profile-wrapper">${avatarHtml}${fallbackHtml}<div class="status-dot" style="background:${myBalance >= 0 ? '#00FF00' : '#BC002D'};"></div><strong>${f}</strong></div>
                         <div class="member-money-details">
                             <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto; padding-right:25px;">交了 ${memberDepositMap[f].toLocaleString()}</span>
-                            <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">(余 ${sign}${Math.round(myBalance).toLocaleString()})</span>
+                            <span style="color:${color}; text-align:right; font-variant-numeric: tabular-nums;">(Balance ${sign}${Math.round(myBalance).toLocaleString()})</span>
                         </div>
                     </div>`;
             });
